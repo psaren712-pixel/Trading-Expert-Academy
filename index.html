@@ -1,120 +1,23 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy | Debashish Pro</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0b0e11; color: #eaecef; text-align: center; padding-bottom: 30px; }
-        
-        header { background: #161a1e; padding: 20px; border-bottom: 2px solid #f0b90b; margin-bottom: 20px; }
-        .logo { color: #f0b90b; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-
-        .container { width: 95%; max-width: 450px; margin: 0 auto; background: #1e2329; padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #2b3139; }
-
-        h3 { margin-bottom: 15px; font-size: 1.2rem; color: #ffffff; }
-
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.85rem; color: #848e9c; margin-bottom: 8px; }
-        input { width: 100%; background: #0b0e11; color: #f0b90b; border: 2px solid #2b3139; padding: 12px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; text-align: center; outline: none; transition: 0.3s; }
-        input:focus { border-color: #f0b90b; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: #0b0e11; padding: 15px; border-radius: 12px; border: 1px solid #2b3139; }
-        .stat-label { font-size: 0.75rem; color: #848e9c; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .sl-val { color: #f6465d; font-size: 1.1rem; font-weight: bold; }
-        .tp-val { color: #2ebd85; font-size: 1.1rem; font-weight: bold; }
-
-        .btn-group { display: flex; gap: 15px; }
-        .btn { flex: 1; padding: 18px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; transform: translateY(0); }
-        .btn:active { transform: translateY(3px); }
-        .buy-btn { background: #2ebd85; box-shadow: 0 4px 0 #1e8a60; }
-        .sell-btn { background: #f6465d; box-shadow: 0 4px 0 #c2364a; }
-
-        #feedback-box { margin-top: 25px; min-height: 120px; padding: 15px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.4s; font-size: 1.1rem; line-height: 1.4; border: 1px solid transparent; }
-        .star-icon { font-size: 2.5rem; color: #f0b90b; margin-bottom: 10px; display: block; }
-    </style>
-</head>
-<body>
-
-<header>
-    <div class="logo">Trading Expert Academy</div>
-</header>
-
-<div class="container">
-    <h3>मार्केट रेजिस्टेंस (Resistance) पर है</h3>
-    
-    <div class="input-group">
-        <label>आपका निवेश (Amount)</label>
-        <input type="number" id="amtInput" value="1000" oninput="updateStats()">
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label">Stop Loss</span>
-            <span class="sl-val" id="slShow">-$50.00</span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label">Take Profit</span>
-            <span class="tp-val" id="tpShow">+$150.00</span>
-        </div>
-    </div>
-
-    <div class="btn-group">
-        <button class="btn buy-btn" onclick="checkTrade('buy')">BUY</button>
-        <button class="btn sell-btn" onclick="checkTrade('sell')">SELL</button>
-    </div>
-
-    <div id="feedback-box"></div>
+<!-- यह ग्राफ वाला सेक्शन आपके पुराने ग्राफ को और प्रोफेशनल बना देगा -->
+<div class="chart-box" style="height: 450px; border: 2px solid #2b3139; border-radius: 15px; margin-bottom: 20px;">
+    <!-- असली लाइव ट्रेडिंग व्यू विजेट -->
+    <div id="tradingview_chart"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+      new TradingView.widget({
+        "width": "100%",
+        "height": "100%",
+        "symbol": "BINANCE:BTCUSDT",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1",
+        "locale": "in",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_chart"
+      });
+    </script>
 </div>
-
-<script>
-    // आवाज़ फंक्शन
-    function say(txt) {
-        window.speechSynthesis.cancel();
-        const speech = new SpeechSynthesisUtterance(txt);
-        speech.lang = 'hi-IN';
-        speech.rate = 0.9;
-        window.speechSynthesis.speak(speech);
-    }
-
-    // ऑटो कैलकुलेशन जब यूजर टाइप करे
-    function updateStats() {
-        const val = document.getElementById('amtInput').value || 0;
-        document.getElementById('slShow').innerText = "-$" + (val * 0.05).toFixed(2);
-        document.getElementById('tpShow').innerText = "+$" + (val * 0.15).toFixed(2);
-    }
-
-    function checkTrade(side) {
-        const amt = document.getElementById('amtInput').value;
-        const box = document.getElementById('feedback-box');
-        const sl = (amt * 0.05).toFixed(2);
-        const tp = (amt * 0.15).toFixed(2);
-        
-        let msg = "";
-        if(side === 'sell') {
-            box.style.background = "rgba(46, 189, 133, 0.1)";
-            box.style.borderColor = "#2ebd85";
-            box.innerHTML = `<span class="star-icon">⭐⭐</span> <b style="color:#2ebd85">परफेक्ट ट्रेड!</b><br>निवेश: ${amt}<br>संभावित मुनाफा: ${tp}`;
-            msg = `बेहतरीन फैसला देबाशीष! रेजिस्टेंस पर सेल करना सबसे समझदारी है। इसमें आपका मुनाफा ${tp} रुपये तक जा सकता है। आपको दो स्टार मिलते हैं।`;
-        } else {
-            box.style.background = "rgba(246, 70, 93, 0.1)";
-            box.style.borderColor = "#f6465d";
-            box.innerHTML = `<b style="color:#f6465d">बड़ी गलती!</b><br>यहाँ खरीदना खतरनाक है।<br>नुकसान का डर: ${sl}`;
-            msg = `गलत ट्रेड! रेजिस्टेंस पर खरीदने से आपका ${sl} रुपये का नुकसान तुरंत हो सकता है। संभल कर ट्रेड करें।`;
-        }
-
-        say(msg);
-
-        // 10 सेकंड बाद साफ़ करें
-        setTimeout(() => {
-            box.innerHTML = "";
-            box.style.background = "transparent";
-            box.style.borderColor = "transparent";
-        }, 10000);
-    }
-</script>
-
-</body>
-</html>
