@@ -1,59 +1,120 @@
-<!-- यह कोड अपनी index.html में अपडेट करें -->
-<div class="panel">
-    <h3>मार्केट रेजिस्टेंस पर है</h3>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Expert Academy | Debashish Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b0e11; color: #eaecef; text-align: center; padding-bottom: 30px; }
+        
+        header { background: #161a1e; padding: 20px; border-bottom: 2px solid #f0b90b; margin-bottom: 20px; }
+        .logo { color: #f0b90b; font-size: 1.5rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        .container { width: 95%; max-width: 450px; margin: 0 auto; background: #1e2329; padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid #2b3139; }
+
+        h3 { margin-bottom: 15px; font-size: 1.2rem; color: #ffffff; }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.85rem; color: #848e9c; margin-bottom: 8px; }
+        input { width: 100%; background: #0b0e11; color: #f0b90b; border: 2px solid #2b3139; padding: 12px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; text-align: center; outline: none; transition: 0.3s; }
+        input:focus { border-color: #f0b90b; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: #0b0e11; padding: 15px; border-radius: 12px; border: 1px solid #2b3139; }
+        .stat-label { font-size: 0.75rem; color: #848e9c; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .sl-val { color: #f6465d; font-size: 1.1rem; font-weight: bold; }
+        .tp-val { color: #2ebd85; font-size: 1.1rem; font-weight: bold; }
+
+        .btn-group { display: flex; gap: 15px; }
+        .btn { flex: 1; padding: 18px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; transform: translateY(0); }
+        .btn:active { transform: translateY(3px); }
+        .buy-btn { background: #2ebd85; box-shadow: 0 4px 0 #1e8a60; }
+        .sell-btn { background: #f6465d; box-shadow: 0 4px 0 #c2364a; }
+
+        #feedback-box { margin-top: 25px; min-height: 120px; padding: 15px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.4s; font-size: 1.1rem; line-height: 1.4; border: 1px solid transparent; }
+        .star-icon { font-size: 2.5rem; color: #f0b90b; margin-bottom: 10px; display: block; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Trading Expert Academy</div>
+</header>
+
+<div class="container">
+    <h3>मार्केट रेजिस्टेंस (Resistance) पर है</h3>
     
-    <!-- पैसे सेट करने का विकल्प -->
-    <div style="margin: 15px 0;">
-        <label style="font-size: 0.9rem; color: #848e9c;">कितने पैसे लगाएंगे? (INR/USD):</label><br>
-        <input type="number" id="investment" value="1000" style="background: #0b0e11; color: #f0b90b; border: 1px solid #2b3139; padding: 10px; border-radius: 5px; width: 80%; margin-top: 5px; font-weight: bold; text-align: center;">
+    <div class="input-group">
+        <label>आपका निवेश (Amount)</label>
+        <input type="number" id="amtInput" value="1000" oninput="updateStats()">
     </div>
 
-    <div class="risk-stats">
-        <div class="stat-item">
-            <span class="label">STOP LOSS (नुकसान)</span>
-            <span class="sl" id="sl-val">-$50.00</span>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Stop Loss</span>
+            <span class="sl-val" id="slShow">-$50.00</span>
         </div>
-        <div class="stat-item">
-            <span class="label">TAKE PROFIT (मुनाफा)</span>
-            <span class="tp" id="tp-val">+$150.00</span>
+        <div class="stat-card">
+            <span class="stat-label">Take Profit</span>
+            <span class="tp-val" id="tpShow">+$150.00</span>
         </div>
     </div>
 
-    <div class="actions">
-        <button class="btn buy" onclick="analyze('buy')">BUY</button>
-        <button class="btn sell" onclick="analyze('sell')">SELL</button>
+    <div class="btn-group">
+        <button class="btn buy-btn" onclick="checkTrade('buy')">BUY</button>
+        <button class="btn sell-btn" onclick="checkTrade('sell')">SELL</button>
     </div>
-    <div id="feedback"></div>
+
+    <div id="feedback-box"></div>
 </div>
 
 <script>
-    function analyze(type) {
-        const amt = document.getElementById('investment').value;
-        const slDisplay = document.getElementById('sl-val');
-        const tpDisplay = document.getElementById('tp-val');
-        const fb = document.getElementById('feedback');
-        
-        // कैलकुलेशन: 5% रिस्क और 15% प्रॉफिट (1:3 रेशियो)
-        const slAmt = (amt * 0.05).toFixed(2);
-        const tpAmt = (amt * 0.15).toFixed(2);
-        
-        slDisplay.innerText = "-" + slAmt;
-        tpDisplay.innerText = "+" + tpAmt;
+    // आवाज़ फंक्शन
+    function say(txt) {
+        window.speechSynthesis.cancel();
+        const speech = new SpeechSynthesisUtterance(txt);
+        speech.lang = 'hi-IN';
+        speech.rate = 0.9;
+        window.speechSynthesis.speak(speech);
+    }
 
-        let message = "";
-        if(type === 'sell') {
-            fb.style.backgroundColor = "rgba(46, 189, 133, 0.15)";
-            fb.innerHTML = `<span class='stars'>⭐⭐</span> <b style='color:#2ebd85'>शानदार!</b><br>
-                            आपने ${amt} रुपये लगाए। आपका संभावित मुनाफा ${tpAmt} है।`;
-            message = `शानदार फैसला! आपने ${amt} रुपये के निवेश पर सही रिस्क मैनेजमेंट किया है। यहाँ आपका मुनाफा ${tpAmt} रुपये हो सकता है।`;
+    // ऑटो कैलकुलेशन जब यूजर टाइप करे
+    function updateStats() {
+        const val = document.getElementById('amtInput').value || 0;
+        document.getElementById('slShow').innerText = "-$" + (val * 0.05).toFixed(2);
+        document.getElementById('tpShow').innerText = "+$" + (val * 0.15).toFixed(2);
+    }
+
+    function checkTrade(side) {
+        const amt = document.getElementById('amtInput').value;
+        const box = document.getElementById('feedback-box');
+        const sl = (amt * 0.05).toFixed(2);
+        const tp = (amt * 0.15).toFixed(2);
+        
+        let msg = "";
+        if(side === 'sell') {
+            box.style.background = "rgba(46, 189, 133, 0.1)";
+            box.style.borderColor = "#2ebd85";
+            box.innerHTML = `<span class="star-icon">⭐⭐</span> <b style="color:#2ebd85">परफेक्ट ट्रेड!</b><br>निवेश: ${amt}<br>संभावित मुनाफा: ${tp}`;
+            msg = `बेहतरीन फैसला देबाशीष! रेजिस्टेंस पर सेल करना सबसे समझदारी है। इसमें आपका मुनाफा ${tp} रुपये तक जा सकता है। आपको दो स्टार मिलते हैं।`;
         } else {
-            fb.style.backgroundColor = "rgba(246, 70, 93, 0.15)";
-            fb.innerHTML = `<b style='color:#f6465d'>बड़ी गलती!</b><br>
-                            यहाँ आपका ${slAmt} का लॉस तुरंत हो सकता है।`;
-            message = `बड़ी गलती! इस ट्रेड में आप अपने ${amt} रुपये में से ${slAmt} रुपये तुरंत खो सकते हैं। रेजिस्टेंस पर कभी न खरीदें।`;
+            box.style.background = "rgba(246, 70, 93, 0.1)";
+            box.style.borderColor = "#f6465d";
+            box.innerHTML = `<b style="color:#f6465d">बड़ी गलती!</b><br>यहाँ खरीदना खतरनाक है।<br>नुकसान का डर: ${sl}`;
+            msg = `गलत ट्रेड! रेजिस्टेंस पर खरीदने से आपका ${sl} रुपये का नुकसान तुरंत हो सकता है। संभल कर ट्रेड करें।`;
         }
 
-        speak(message);
-        setTimeout(() => { fb.innerHTML = ""; fb.style.backgroundColor = "transparent"; }, 10000);
+        say(msg);
+
+        // 10 सेकंड बाद साफ़ करें
+        setTimeout(() => {
+            box.innerHTML = "";
+            box.style.background = "transparent";
+            box.style.borderColor = "transparent";
+        }, 10000);
     }
 </script>
+
+</body>
+</html>
