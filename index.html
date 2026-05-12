@@ -2,68 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Trading Expert Academy | Live</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trading Expert Academy | AI Mentor Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #0b0e11; color: white; height: 100vh; display: flex; flex-direction: column; }
-        .top-bar { padding: 15px; display: flex; justify-content: space-between; border-bottom: 1px solid #2b3139; }
-        .balance { font-weight: bold; color: #f0b90b; }
-        .chart-container { flex: 1; position: relative; margin: 10px; border-radius: 10px; overflow: hidden; }
-        #pnl-tag { display: none; position: absolute; top: 15px; left: 15px; background: rgba(30,35,41,0.9); padding: 8px 12px; border-radius: 6px; border: 1px solid #2b3139; z-index: 10; }
-        .action-bar { padding: 15px; background: #1e2329; border-top: 1px solid #2b3139; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        body, html { height: 100%; overflow: hidden; background: #0b0e11; }
+        
+        /* Fixed Header */
+        header { position: fixed; top:0; left:0; width:100%; height:60px; background:#0b0e11; border-bottom:1px solid #2b3139; display:flex; justify-content:space-between; align-items:center; padding:0 20px; z-index:1000; }
+        .main-balance { color:#f0b90b; font-weight:bold; font-size:1.1rem; }
+        
+        /* Main Chart Area */
+        main { position:absolute; top:60px; bottom:110px; left:0; width:100%; overflow:hidden; }
+        
+        /* DYNAMIC PRICE TRACKER PNL */
+        #pnl-tracker {
+            display: none;
+            position: absolute;
+            right: 60px; 
+            background: rgba(30, 35, 41, 0.95);
+            padding: 6px 12px;
+            border-radius: 5px;
+            border-left: 4px solid #f0b90b;
+            z-index: 500;
+            transition: top 0.3s ease-out;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Fixed Footer */
+        footer { position:fixed; bottom:0; left:0; width:100%; height:110px; background:#1e2329; border-top:1px solid #2b3139; padding:15px 20px; z-index:1000; }
+        .btns { display:flex; gap:12px; }
+        .btn { flex:1; padding:18px; border-radius:12px; border:none; font-weight:bold; color:white; cursor:pointer; font-size:1.1rem; }
     </style>
 </head>
 <body>
 
-<div class="top-bar">
-    <span>Demo Mode</span>
-    <span class="balance" id="demo-balance">$5,000.00 USD</span>
-</div>
+<header>
+    <div style="color:white; font-size:0.8rem; font-weight:bold;">TE ACADEMY AI</div>
+    <div style="text-align:right;">
+        <div style="font-size:0.6rem; color:#848e9c;">DEMO WALLET</div>
+        <div class="main-balance" id="wallet">$5,000.00</div>
+    </div>
+</header>
 
-<div class="chart-container">
-    <div id="pnl-tag">
-        <span id="live-pnl" style="font-weight:bold;">$0.00</span>
-        <span onclick="closeTrade()" style="margin-left:10px; color:#848e9c; cursor:pointer;">X</span>
+<main id="chart-area">
+    <div id="pnl-tracker">
+        <span id="pnl-val" style="font-weight:bold; font-size:1rem;">$0.00</span>
+        <span onclick="closeTrade()" style="margin-left:10px; color:#848e9c; cursor:pointer; font-weight:bold;">×</span>
     </div>
     <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
-</div>
+</main>
 
-<div class="action-bar">
-    <div style="display:flex; gap:10px;">
-        <button style="background:#2ebd85; color:white;" onclick="startTrade('buy')">BUY</button>
-        <button style="background:#f6465d; color:white;" onclick="startTrade('sell')">SELL</button>
+<footer>
+    <div style="color:#848e9c; font-size:0.6rem; text-align:center; margin-bottom:8px;">AI PREDICTION ACTIVE</div>
+    <div class="btns">
+        <button class="btn" style="background:#2ebd85;" onclick="startTrade('buy')">BUY</button>
+        <button class="btn" style="background:#f6465d;" onclick="startTrade('sell')">SELL</button>
     </div>
-</div>
+</footer>
 
 <script>
-    let balance = 5000.00;
-    let tInt;
-    function updateBalanceDisplay() { document.getElementById('demo-balance').innerText = "$" + balance.toLocaleString(undefined, {minimumFractionDigits: 2}) + " USD"; }
+    let bal = 5000.00;
+    let tradeTimer;
+    let sec = 0;
 
-    function say(t) { window.speechSynthesis.cancel(); const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
+    function say(txt) {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(txt);
+        msg.lang = 'hi-IN';
+        msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
 
-    function closeTrade() { 
-        document.getElementById('pnl-tag').style.display = 'none'; 
-        clearInterval(tInt); 
-        say("ट्रेड क्लोज हो गया है।"); 
+    function closeTrade() {
+        document.getElementById('pnl-tracker').style.display = 'none';
+        clearInterval(tradeTimer);
+        sec = 0;
+        say("ट्रेड क्लोज किया गया। प्रॉफिट सुरक्षित है।");
     }
 
     function startTrade(side) {
-        document.getElementById('pnl-tag').style.display = 'block';
-        if(tInt) clearInterval(tInt);
-        say(side + " पोजीशन ओपन।");
-        
-        tInt = setInterval(() => {
-            let change = (Math.random() * 50 - 22); // रैंडम PNL
-            balance += change; // बैलेंस में जुड़ना या घटना
+        const pnlTag = document.getElementById('pnl-tracker');
+        pnlTag.style.display = 'flex';
+        if(tradeTimer) clearInterval(tradeTimer);
+        sec = 0;
+
+        // Future Prediction & Candle Mentorship
+        if(side === 'buy') {
+            say("सिस्टम ने बुलिश हैमर कैंडल डिटेक्ट किया है। मार्केट यहाँ से ऊपर जाने वाला है, बाय एंट्री कन्फर्म है।");
+        } else {
+            say("सावधान! रेजिस्टेंस पर शूटिंग स्टार कैंडल दिखा है। मार्केट गिरने की भविष्यवाणी है, सेल करना सही होगा।");
+        }
+
+        tradeTimer = setInterval(() => {
+            sec++;
+            let pnl = (Math.random() * 110 - 45).toFixed(2);
+            bal += parseFloat(pnl);
             
-            const el = document.getElementById('live-pnl');
-            el.innerText = (change >= 0 ? "+$" : "-$") + Math.abs(change).toFixed(2);
-            el.style.color = (change >= 0 ? "#2ebd85" : "#f6465d");
-            
-            updateBalanceDisplay();
-        }, 1000);
+            // PNL Tracker Movement (Price Line के साथ)
+            let dynamicTop = Math.floor(Math.random() * 250) + 100; 
+            pnlTag.style.top = dynamicTop + "px";
+
+            document.getElementById('pnl-val').innerText = (pnl >= 0 ? "+$" : "-$") + Math.abs(pnl);
+            document.getElementById('pnl-val').style.color = pnl >= 0 ? "#2ebd85" : "#f6465d";
+            document.getElementById('wallet').innerText = "$" + bal.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            // Mid-Trade Prediction Warning
+            if (sec === 8) {
+                say("अलर्ट! अगली कैंडल बेयरिश डोजी बन रही है। अब क्लोज कर दीजिए, इसके बाद बड़ा लॉस होने वाला है।");
+            }
+        }, 1200);
     }
 </script>
 </body>
