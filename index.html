@@ -3,79 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy - Advanced Guide</title>
+    <title>Trading Expert Academy Pro</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #0f0f0f; color: white; text-align: center; margin: 0; padding: 20px; }
-        .container { max-width: 450px; margin: auto; background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; }
-        .btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .buy-btn { background-color: #28a745; color: white; }
-        .sell-btn { background-color: #dc3545; color: white; }
-        #guide-box { display: none; background: #2a2a2a; padding: 15px; margin-top: 20px; border-radius: 10px; text-align: left; border-left: 5px solid #ffcc00; }
-        h3 { color: #ffcc00; margin-top: 0; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 10px; color: #ddd; }
+        body { font-family: 'Segoe UI', sans-serif; background: #080808; color: white; margin: 0; text-align: center; }
+        .container { max-width: 500px; margin: auto; padding: 20px; }
+        .card { background: #151515; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
+        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
+        .wallet { font-size: 24px; color: #ffcc00; font-weight: bold; margin: 15px 0; }
+        .pnl { font-size: 18px; margin: 10px 0; font-weight: bold; }
+        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .buy { background: #00c805; color: white; }
+        .sell { background: #ff3b3b; color: white; }
+        .login-btn { background: gold; color: black; }
+        #app-ui { display: none; }
+        .profit { color: #00ff00; }
+        .loss { color: #ff3333; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Trading Expert Academy</h2>
-        <p>अपना ट्रेड चुनें और गाइडेंस देखें</p>
-        
-        <button class="btn buy-btn" onclick="showGuide('buy')">BUY गाइड शुरू करें 📈</button>
-        <button class="btn sell-btn" onclick="showGuide('sell')">SELL गाइड शुरू करें 📉</button>
-
-        <!-- यहाँ नीचे डिक्शनरी/गाइड खुलेगी -->
-        <div id="guide-box">
-            <h3 id="guide-title">निर्देश:</h3>
-            <ul id="guide-list">
-                <!-- यहाँ लिस्ट अपने आप आएगी -->
-            </ul>
+    <!-- 1. LOGIN / REGISTER SYSTEM -->
+    <div id="auth-ui" class="container">
+        <div class="card">
+            <h2 style="color: gold;">Expert Academy</h2>
+            <p>लॉगिन या रजिस्टर करें</p>
+            <input type="text" id="user" placeholder="अपना नाम लिखें">
+            <input type="password" id="pass" placeholder="पासवर्ड">
+            <button class="btn login-btn" onclick="login()">ENTER SYSTEM</button>
         </div>
     </div>
 
+    <!-- 2. REAL TRADING DASHBOARD -->
+    <div id="app-ui" class="container">
+        <div class="card">
+            <h3 id="welcome-msg">नमस्ते!</h3>
+            <div class="wallet">Balance: $<span id="balance">5000.00</span></div>
+            <div id="status" class="pnl">कोई एक्टिव ट्रेड नहीं है</div>
+            <hr border="0.5px solid #333">
+            <p>Investment Amount ($):</p>
+            <input type="number" id="trade-amount" value="100" min="10">
+            
+            <button class="btn buy" onclick="startTrade('BUY')">BUY (लगाएँ)</button>
+            <button class="btn sell" onclick="startTrade('SELL')">SELL (लगाएँ)</button>
+        </div>
+
+        <div id="guide-msg" style="color: gray; font-size: 14px;"></div>
+    </div>
+
     <script>
-        function showGuide(type) {
-            var box = document.getElementById('guide-box');
-            var list = document.getElementById('guide-list');
-            var title = document.getElementById('guide-title');
-            box.style.display = 'block';
-            list.innerHTML = ""; // पुराना साफ करने के लिए
+        let balance = 5000.00;
+        let currentTrade = null;
+        let tradeInterval = null;
 
-            if(type === 'buy') {
-                title.innerText = "BUY करने के नियम:";
-                var steps = [
-                    "1. मार्केट का ट्रेंड चेक करें (Bullish होना चाहिए)।",
-                    "2. RSI इंडिकेटर को देखें, क्या यह 30 के पास है?",
-                    "3. सपोर्ट लेवल पर ग्रीन कैंडल बनने का इंतज़ार करें।",
-                    "4. एंट्री लेने से पहले स्टॉप लॉस (SL) तय करें।"
-                ];
-                guide("बाय करने के नियम नीचे दिए गए हैं। सबसे पहले मार्केट ट्रेंड और सपोर्ट लेवल चेक करें।");
-            } else {
-                title.innerText = "SELL करने के नियम:";
-                var steps = [
-                    "1. मार्केट का ट्रेंड चेक करें (Bearish होना चाहिए)।",
-                    "2. रेजिस्टेंस लेवल पर रेड कैंडल देखें।",
-                    "3. वॉल्यूम चेक करें कि सेलर्स बढ़ रहे हैं या नहीं।",
-                    "4. अपनी रिस्क के हिसाब से टारगेट सेट करें।"
-                ];
-                guide("सेल करने के नियम नीचे लोड हो गए हैं। रेजिस्टेंस और वॉल्यूम पर ध्यान दें।");
+        function login() {
+            let name = document.getElementById('user').value;
+            if(name !== "") {
+                document.getElementById('auth-ui').style.display = 'none';
+                document.getElementById('app-ui').style.display = 'block';
+                document.getElementById('welcome-msg').innerText = "नमस्ते, " + name + "!";
+                speak("लॉगिन सफल। आपके अकाउंट में 5000 डॉलर जमा कर दिए गए हैं।");
             }
-
-            // लिस्ट को स्क्रीन पर डालना
-            steps.forEach(function(step) {
-                var li = document.createElement("li");
-                li.innerText = step;
-                list.appendChild(li);
-            });
         }
 
-        function guide(message) {
-            window.speechSynthesis.cancel(); 
-            var speech = new SpeechSynthesisUtterance();
-            speech.text = message;
-            speech.lang = 'hi-IN';
-            window.speechSynthesis.speak(speech);
+        function startTrade(type) {
+            let amount = parseFloat(document.getElementById('trade-amount').value);
+            if(amount > balance) {
+                alert("बैलेंस कम है!");
+                return;
+            }
+
+            if(tradeInterval) clearInterval(tradeInterval);
+            
+            speak(type + " ट्रेड शुरू हो गया है। मार्केट पर नज़र रखें।");
+            let initialPrice = 100;
+            let currentProfit = 0;
+
+            tradeInterval = setInterval(() => {
+                let change = (Math.random() * 2 - 1).toFixed(2); // असली मार्केट की तरह ऊपर नीचे
+                currentProfit = parseFloat(currentProfit) + parseFloat(change);
+                
+                let statusEl = document.getElementById('status');
+                statusEl.innerHTML = `Profit/Loss: <span class="${currentProfit >= 0 ? 'profit' : 'loss'}">$${currentProfit.toFixed(2)}</span>`;
+                
+                // बैलेंस को भी अपडेट करना (दिखाने के लिए)
+                document.getElementById('balance').innerText = (balance + currentProfit).toFixed(2);
+            }, 1000);
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'hi-IN';
+            window.speechSynthesis.speak(msg);
         }
     </script>
 </body>
