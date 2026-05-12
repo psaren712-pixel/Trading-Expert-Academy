@@ -1,59 +1,78 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading Expert Academy Pro</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #080808; color: white; margin: 0; text-align: center; }
-        .container { max-width: 500px; margin: auto; padding: 20px; }
-        .card { background: #151515; padding: 25px; border-radius: 15px; border: 1px solid #333; margin-bottom: 20px; }
-        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
-        .wallet { font-size: 24px; color: #ffcc00; font-weight: bold; margin: 15px 0; }
-        .pnl { font-size: 18px; margin: 10px 0; font-weight: bold; }
-        .btn { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; margin: 0; padding: 20px; }
+        .container { max-width: 450px; margin: auto; }
+        .card { background: #161616; padding: 25px; border-radius: 20px; border: 1px solid #333; text-align: center; margin-bottom: 20px; }
+        
+        /* Login Section */
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .login-btn { background: #ffcc00; color: black; }
+
+        /* Dashboard */
+        .balance-box { background: #222; padding: 15px; border-radius: 12px; border: 1px solid gold; margin: 15px 0; }
+        .amount { font-size: 30px; color: gold; font-weight: bold; }
+        .pnl-live { font-size: 18px; padding: 10px; margin: 10px 0; background: #000; border-radius: 8px; font-weight: bold; }
+        
+        /* History Section */
+        .history-box { text-align: left; background: #111; padding: 15px; border-radius: 10px; max-height: 200px; overflow-y: auto; font-size: 13px; border: 1px solid #333; }
+        .history-item { border-bottom: 1px solid #222; padding: 8px 0; display: flex; justify-content: space-between; }
+        
         .buy { background: #00c805; color: white; }
         .sell { background: #ff3b3b; color: white; }
-        .login-btn { background: gold; color: black; }
-        #app-ui { display: none; }
+        .close-btn { background: #555; color: white; margin-top: 5px; }
         .profit { color: #00ff00; }
         .loss { color: #ff3333; }
     </style>
 </head>
 <body>
 
-    <!-- 1. LOGIN / REGISTER SYSTEM -->
+    <!-- 1. ENGLISH LOGIN -->
     <div id="auth-ui" class="container">
         <div class="card">
             <h2 style="color: gold;">Expert Academy</h2>
-            <p>लॉगिन या रजिस्टर करें</p>
-            <input type="text" id="user" placeholder="अपना नाम लिखें">
-            <input type="password" id="pass" placeholder="पासवर्ड">
-            <button class="btn login-btn" onclick="login()">ENTER SYSTEM</button>
+            <p>Login to your Trading Account</p>
+            <input type="text" id="user" placeholder="Username">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn login-btn" onclick="login()">SIGN IN</button>
         </div>
     </div>
 
-    <!-- 2. REAL TRADING DASHBOARD -->
-    <div id="app-ui" class="container">
+    <!-- 2. HINDI DASHBOARD & SYSTEM -->
+    <div id="app-ui" class="container" style="display:none;">
         <div class="card">
             <h3 id="welcome-msg">नमस्ते!</h3>
-            <div class="wallet">Balance: $<span id="balance">5000.00</span></div>
-            <div id="status" class="pnl">कोई एक्टिव ट्रेड नहीं है</div>
-            <hr border="0.5px solid #333">
-            <p>Investment Amount ($):</p>
-            <input type="number" id="trade-amount" value="100" min="10">
-            
-            <button class="btn buy" onclick="startTrade('BUY')">BUY (लगाएँ)</button>
-            <button class="btn sell" onclick="startTrade('SELL')">SELL (लगाएँ)</button>
+            <div class="balance-box">
+                <div style="font-size: 12px; color: gray;">TOTAL ACCOUNT BALANCE</div>
+                <div class="amount">$<span id="balance">5000.00</span></div>
+            </div>
+
+            <div id="status" class="pnl-live">कोई एक्टिव ट्रेड नहीं है</div>
+
+            <button id="buy-btn" class="btn buy" onclick="startTrade('BUY')">BUY 📈</button>
+            <button id="sell-btn" class="btn sell" onclick="startTrade('SELL')">SELL 📉</button>
+            <button id="close-btn" class="btn close-btn" onclick="closeTrade()" style="display:none;">CLOSE TRADE (सौदा काटें)</button>
         </div>
 
-        <div id="guide-msg" style="color: gray; font-size: 14px;"></div>
+        <!-- TRADE HISTORY -->
+        <div class="card" style="padding: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: gold;">Trade History</h4>
+            <div id="history-list" class="history-box">
+                <div style="color: gray; text-align: center;">अभी कोई इतिहास नहीं है</div>
+            </div>
+        </div>
     </div>
 
     <script>
         let balance = 5000.00;
-        let currentTrade = null;
         let tradeInterval = null;
+        let currentPnl = 0;
+        let activeType = "";
 
         function login() {
             let name = document.getElementById('user').value;
@@ -61,33 +80,49 @@
                 document.getElementById('auth-ui').style.display = 'none';
                 document.getElementById('app-ui').style.display = 'block';
                 document.getElementById('welcome-msg').innerText = "नमस्ते, " + name + "!";
-                speak("लॉगिन सफल। आपके अकाउंट में 5000 डॉलर जमा कर दिए गए हैं।");
+                speak("लॉगिन सफल। आपके अकाउंट में 5000 डॉलर का बैलेंस तैयार है।");
             }
         }
 
         function startTrade(type) {
-            let amount = parseFloat(document.getElementById('trade-amount').value);
-            if(amount > balance) {
-                alert("बैलेंस कम है!");
-                return;
-            }
-
-            if(tradeInterval) clearInterval(tradeInterval);
+            activeType = type;
+            document.getElementById('buy-btn').disabled = true;
+            document.getElementById('sell-btn').disabled = true;
+            document.getElementById('close-btn').style.display = 'block';
             
-            speak(type + " ट्रेड शुरू हो गया है। मार्केट पर नज़र रखें।");
-            let initialPrice = 100;
-            let currentProfit = 0;
-
+            speak(type + " ट्रेड शुरू हो गया है। लाइव प्रॉफिट और लॉस देखें।");
+            
             tradeInterval = setInterval(() => {
-                let change = (Math.random() * 2 - 1).toFixed(2); // असली मार्केट की तरह ऊपर नीचे
-                currentProfit = parseFloat(currentProfit) + parseFloat(change);
+                let move = (Math.random() * 20 - 10).toFixed(2); 
+                currentPnl = (parseFloat(currentPnl) + parseFloat(move)).toFixed(2);
                 
                 let statusEl = document.getElementById('status');
-                statusEl.innerHTML = `Profit/Loss: <span class="${currentProfit >= 0 ? 'profit' : 'loss'}">$${currentProfit.toFixed(2)}</span>`;
-                
-                // बैलेंस को भी अपडेट करना (दिखाने के लिए)
-                document.getElementById('balance').innerText = (balance + currentProfit).toFixed(2);
+                statusEl.innerHTML = `P&L: <span class="${currentPnl >= 0 ? 'profit' : 'loss'}">$${currentPnl}</span>`;
             }, 1000);
+        }
+
+        function closeTrade() {
+            clearInterval(tradeInterval);
+            balance = parseFloat(balance) + parseFloat(currentPnl);
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            
+            // Add to History
+            const historyList = document.getElementById('history-list');
+            if(historyList.innerHTML.includes("कोई इतिहास नहीं")) historyList.innerHTML = "";
+            
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `<span>${activeType} Trade</span> <span class="${currentPnl >= 0 ? 'profit' : 'loss'}">${currentPnl >= 0 ? '+' : ''}$${currentPnl}</span>`;
+            historyList.prepend(item);
+
+            speak("सौदा बंद हो गया है। आपका नया बैलेंस अपडेट कर दिया गया है।");
+
+            // Reset UI
+            document.getElementById('status').innerText = "ट्रेड बंद - प्रॉफिट/लॉस सेव हो गया";
+            document.getElementById('buy-btn').disabled = false;
+            document.getElementById('sell-btn').disabled = false;
+            document.getElementById('close-btn').style.display = 'none';
+            currentPnl = 0;
         }
 
         function speak(text) {
