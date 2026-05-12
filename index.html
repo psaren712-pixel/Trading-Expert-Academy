@@ -3,121 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <title>Trading Expert Academy | Student Portal</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #0b0e11; color: #fff; overflow-x: hidden; }
-
-        /* Auth Screen */
-        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; display: flex; align-items: center; justify-content: center; z-index: 2000; }
-        .auth-box { background: #1e2329; padding: 35px; border-radius: 24px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #2b3139; }
-        .auth-box h2 { color: #f0b90b; margin-bottom: 20px; font-size: 1.8rem; }
-        .auth-box input { width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 14px; border-radius: 12px; color: #fff; margin-bottom: 12px; outline: none; transition: 0.3s; }
-        .auth-box input:focus { border-color: #f0b90b; }
-        .auth-box button { width: 100%; background: #f0b90b; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; color: #0b0e11; font-size: 1rem; }
-
-        /* Loader */
-        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
-        .spinner { width: 50px; height: 50px; border: 5px solid #2b3139; border-top: 5px solid #f0b90b; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* App UI */
-        #main-content { display: none; text-align: center; padding-bottom: 40px; }
-        .pnl-box { background: #1e2329; margin: 15px; padding: 25px; border-radius: 15px; border: 1px solid #2b3139; display: none; }
-        .pnl-value { font-size: 2.2rem; font-weight: bold; margin: 10px 0; }
-        .green { color: #2ebd85; }
-        .red { color: #f6465d; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #0b0e11; color: white; text-align: center; }
+        .container { background: #1e2329; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; margin: 100px auto; border: 1px solid #2b3139; }
+        input { width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 12px; border-radius: 10px; margin-bottom: 15px; color: #fff; outline: none; }
+        button { width: 100%; background: #f0b90b; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #0b0e11; }
+        .link { color: #848e9c; font-size: 0.8rem; margin-top: 15px; cursor: pointer; display: block; }
+        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay">
-    <!-- Register (Fixing inputs) -->
-    <div class="auth-box" id="reg-box">
-        <h2>Register</h2>
-        <input type="email" placeholder="Email Address">
+<div id="auth-section">
+    <!-- Register -->
+    <div class="container" id="reg-ui">
+        <h2 style="color:#f0b90b; margin-bottom:20px;">Create Account</h2>
+        <input type="email" id="r-email" placeholder="Student Email">
         <input type="password" id="r-pass" placeholder="Create Password">
-        <input type="password" id="c-pass" placeholder="Confirm Password">
-        <button onclick="handleRegister()">REGISTER NOW</button>
-        <p style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;" onclick="toLogin()">Login to Academy</p>
+        <button onclick="registerStudent()">JOIN ACADEMY</button>
+        <span class="link" onclick="toggleUI('log')">Already a student? Login</span>
     </div>
 
     <!-- Login -->
-    <div class="auth-box" id="log-box" style="display:none;">
-        <h2>Login</h2>
+    <div class="container" id="log-ui" style="display:none;">
+        <h2 style="color:#f0b90b; margin-bottom:20px;">Student Login</h2>
+        <input type="email" id="l-email" placeholder="Registered Email">
         <input type="password" id="l-pass" placeholder="Enter Password">
-        <button onclick="handleLogin()">ACCESS ACADEMY</button>
-        <p style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;" onclick="toReg()">New User? Register</p>
+        <button onclick="loginStudent()">START LEARNING</button>
+        <p id="err" style="color:#f6465d; font-size:0.8rem; margin-top:10px; display:none;">Invalid Email or Password!</p>
+        <span class="link" onclick="toggleUI('reg')">New Student? Register</span>
     </div>
 </div>
 
 <div id="loader">
-    <div class="spinner"></div>
-    <p style="color:#f0b90b; margin-top:20px;">SYNCING MARKET DATA...</p>
+    <div style="width:50px; height:50px; border:5px solid #2b3139; border-top:5px solid #f0b90b; border-radius:50%; animation:spin 1s linear infinite;"></div>
+    <p style="color:#f0b90b; margin-top:15px;">Loading Your Dashboard...</p>
 </div>
 
-<div id="main-content">
-    <h2 style="color:#f0b90b; padding:20px;">TE ACADEMY LIVE</h2>
-    <div style="width:95%; margin:auto; height:350px; border-radius:15px; overflow:hidden; border:1px solid #2b3139;">
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
-    </div>
-
-    <div class="pnl-box" id="pnl-area">
-        <p style="color:#848e9c; font-size:0.8rem;">Floating Profit/Loss</p>
-        <div id="live-pnl" class="pnl-value">$0.00</div>
-    </div>
-
-    <div style="padding:20px; max-width:450px; margin:auto;">
-        <input type="number" id="trade-amt" value="1000" style="width:100%; background:#0b0e11; color:#f0b90b; border:1px solid #2b3139; padding:15px; border-radius:12px; text-align:center; font-size:1.2rem; margin-bottom:15px;">
-        <div style="display:flex; gap:10px;">
-            <button style="flex:1; background:#2ebd85; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('buy')">BUY</button>
-            <button style="flex:1; background:#f6465d; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('sell')">SELL</button>
-        </div>
-    </div>
+<div id="dashboard" style="display:none; padding:20px;">
+    <h2 style="color:#f0b90b;">Welcome to the Academy!</h2>
+    <p id="user-welcome" style="margin-top:10px;"></p>
+    <!-- यहाँ आप अपना कोर्स और चार्ट डाल सकते हैं -->
 </div>
 
 <script>
-    function say(t) { window.speechSynthesis.cancel(); const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
-
-    function toLogin() { document.getElementById('reg-box').style.display='none'; document.getElementById('log-box').style.display='block'; }
-    function toReg() { document.getElementById('reg-box').style.display='block'; document.getElementById('log-box').style.display='none'; }
-
-    function handleRegister() {
-        const p1 = document.getElementById('r-pass').value;
-        const p2 = document.getElementById('c-pass').value;
-        if(p1 === p2 && p1 !== "") {
-            localStorage.setItem('te_pass', p1);
-            say("रजिस्ट्रेशन सफल रहा। कृपया लॉगिन करें।");
-            toLogin();
-        } else { alert("Passwords do not match!"); }
+    function toggleUI(type) {
+        document.getElementById('reg-ui').style.display = type === 'reg' ? 'block' : 'none';
+        document.getElementById('log-ui').style.display = type === 'log' ? 'block' : 'none';
     }
 
-    function handleLogin() {
-        if(document.getElementById('l-pass').value === localStorage.getItem('te_pass')) {
-            document.getElementById('auth-overlay').style.display='none';
-            document.getElementById('loader').style.display='flex';
+    function registerStudent() {
+        const email = document.getElementById('r-email').value;
+        const pass = document.getElementById('r-pass').value;
+        if(email && pass) {
+            // डेटा को ब्राउज़र में सेव करना
+            localStorage.setItem(email, pass); 
+            alert("Account Created! Now Login.");
+            toggleUI('log');
+        } else { alert("Please fill all fields!"); }
+    }
+
+    function loginStudent() {
+        const email = document.getElementById('l-email').value;
+        const pass = document.getElementById('l-pass').value;
+        const savedPass = localStorage.getItem(email);
+
+        if(savedPass && savedPass === pass) {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('loader').style.display = 'flex';
             setTimeout(() => {
-                document.getElementById('loader').style.display='none';
-                document.getElementById('main-content').style.display='block';
-                say("स्वागत है देबाशीष! आपका पोर्टल अब लाइव है।");
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('user-welcome').innerText = "Hello, Student (" + email + ")";
             }, 3000);
-        } else { alert("Wrong Password!"); }
-    }
-
-    let tradeInt;
-    function startTrade(type) {
-        document.getElementById('pnl-area').style.display = 'block';
-        if(tradeInt) clearInterval(tradeInt);
-        say(type === 'buy' ? "बाय ट्रेड शुरू।" : "सेल ट्रेड शुरू।");
-        
-        tradeInt = setInterval(() => {
-            let change = (Math.random() * 12 - 5).toFixed(2);
-            const disp = document.getElementById('live-pnl');
-            disp.innerText = (change >= 0 ? "+$" : "-$") + Math.abs(change);
-            disp.className = "pnl-value " + (change >= 0 ? "green" : "red");
-        }, 1500);
+        } else {
+            document.getElementById('err').style.display = 'block';
+        }
     }
 </script>
+
+<style> @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } </style>
 </body>
 </html>
