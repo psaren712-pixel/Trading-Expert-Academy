@@ -3,26 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy | Student Portal</title>
+    <title>Trading Expert Academy</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background-color: #0b0e11; color: #fff; overflow-x: hidden; }
-
-        /* Auth UI */
+        body { background: #0b0e11; color: #fff; overflow-x: hidden; }
         #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; display: flex; align-items: center; justify-content: center; z-index: 2000; }
         .auth-box { background: #1e2329; padding: 30px; border-radius: 20px; width: 90%; max-width: 380px; text-align: center; border: 1px solid #2b3139; }
         .auth-box h2 { color: #f0b90b; margin-bottom: 20px; }
         .auth-box input { width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 12px; border-radius: 10px; margin-bottom: 12px; color: #fff; outline: none; }
         .auth-box button { width: 100%; background: #f0b90b; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #0b0e11; margin-top: 5px; }
         .toggle-txt { color: #848e9c; font-size: 0.8rem; margin-top: 15px; cursor: pointer; display: block; }
-
-        /* Loader */
         #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; z-index: 3000; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid #2b3139; border-top: 5px solid #f0b90b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Main Academy UI */
         #main-content { display: none; }
         .pnl-top { background: #1e2329; margin: 10px; padding: 15px; border-radius: 15px; border: 1px solid #2b3139; display: none; position: relative; text-align: center; }
         .close-pnl { position: absolute; top: 10px; right: 15px; cursor: pointer; color: #848e9c; font-weight: bold; }
@@ -31,115 +25,53 @@
     </style>
 </head>
 <body>
-
 <div id="auth-overlay">
-    <!-- Register -->
     <div class="auth-box" id="reg-box">
         <h2>Join Academy</h2>
         <input type="email" id="r-email" placeholder="Email">
         <input type="password" id="r-pass" placeholder="Password">
+        <input type="password" id="r-cpass" placeholder="Confirm Password">
         <button onclick="handleRegister()">CREATE & ENTER</button>
         <span class="toggle-txt" onclick="showLogin()">Already a member? Login</span>
     </div>
-
-    <!-- Login -->
     <div class="auth-box" id="log-box" style="display:none;">
-        <h2>Welcome Back</h2>
+        <h2>Login</h2>
         <input type="email" id="l-email" placeholder="Email">
         <input type="password" id="l-pass" placeholder="Password">
         <button onclick="handleLogin()">LOGIN</button>
         <span class="toggle-txt" onclick="showForgot()">Forgot Password?</span>
         <span class="toggle-txt" onclick="showReg()">New Student? Register</span>
     </div>
-
-    <!-- Forgot Password Section -->
     <div class="auth-box" id="forgot-box" style="display:none;">
-        <h2>Recover Account</h2>
+        <h2>Recover</h2>
         <input type="email" id="f-email" placeholder="Registered Email">
-        <button onclick="handleForgot()">SEND RECOVERY LINK</button>
-        <p id="f-success" style="color: #2ebd85; font-size: 0.8rem; margin-top: 10px; display: none;">Link sent to your email!</p>
+        <button onclick="handleForgot()">SEND RECOVERY</button>
         <span class="toggle-txt" onclick="showLogin()">Back to Login</span>
     </div>
 </div>
-
-<div id="loader"><div class="spinner"></div><p style="color:#f0b90b; margin-top:20px; font-weight:bold;">SYNCING MARKET...</p></div>
-
+<div id="loader"><div class="spinner"></div><p style="color:#f0b90b; margin-top:20px; font-weight:bold;">SYNCING...</p></div>
 <div id="main-content">
     <header style="padding:15px; text-align:center;"><h2 style="color:#f0b90b;">TE ACADEMY LIVE</h2></header>
-    
-    <div class="pnl-top" id="pnl-section">
-        <span class="close-pnl" onclick="closeTrade()">X</span>
-        <p style="font-size:0.7rem; color:#848e9c;">Floating Profit/Loss</p>
-        <div id="live-pnl" class="pnl-val">$0.00</div>
-    </div>
-
-    <div style="height:350px; margin:10px; border:1px solid #2b3139; border-radius:15px; overflow:hidden;">
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
-    </div>
-
+    <div class="pnl-top" id="pnl-section"><span class="close-pnl" onclick="closeTrade()">X</span><p style="font-size:0.7rem; color:#848e9c;">Floating Profit/Loss</p><div id="live-pnl" class="pnl-val">$0.00</div></div>
+    <div style="height:350px; margin:10px; border:1px solid #2b3139; border-radius:15px; overflow:hidden;"><iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe></div>
     <div style="padding:20px; max-width:450px; margin:auto;">
         <input type="number" id="amt" value="1000" style="width:100%; background:#0b0e11; color:#f0b90b; border:1px solid #2b3139; padding:15px; border-radius:12px; text-align:center; font-size:1.2rem; margin-bottom:15px;">
-        <div style="display:flex; gap:10px;">
-            <button style="flex:1; background:#2ebd85; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('buy')">BUY</button>
-            <button style="flex:1; background:#f6465d; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('sell')">SELL</button>
-        </div>
+        <div style="display:flex; gap:10px;"><button style="flex:1; background:#2ebd85; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('buy')">BUY</button><button style="flex:1; background:#f6465d; color:white; padding:15px; border-radius:10px; border:none; font-weight:bold;" onclick="startTrade('sell')">SELL</button></div>
     </div>
 </div>
-
 <script>
     function say(t) { window.speechSynthesis.cancel(); const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
     function showLogin() { hideAll(); document.getElementById('log-box').style.display='block'; }
     function showReg() { hideAll(); document.getElementById('reg-box').style.display='block'; }
     function showForgot() { hideAll(); document.getElementById('forgot-box').style.display='block'; }
     function hideAll() { document.getElementById('reg-box').style.display='none'; document.getElementById('log-box').style.display='none'; document.getElementById('forgot-box').style.display='none'; }
-
-    function enterDashboard() {
-        document.getElementById('auth-overlay').style.display='none';
-        document.getElementById('loader').style.display='flex';
-        setTimeout(() => {
-            document.getElementById('loader').style.display='none';
-            document.getElementById('main-content').style.display='block';
-        }, 2500);
-    }
-
-    function handleRegister() {
-        const e = document.getElementById('r-email').value, p = document.getElementById('r-pass').value;
-        if(e && p) { localStorage.setItem(e, p); say("अकाउंट बन गया। आपका स्वागत है!"); enterDashboard(); }
-        else { alert("Please fill all fields!"); }
-    }
-
-    function handleLogin() {
-        const e = document.getElementById('l-email').value, p = document.getElementById('l-pass').value;
-        if(localStorage.getItem(e) === p) { say("लॉगिन सफल रहा।"); enterDashboard(); }
-        else { alert("Wrong Email or Password!"); }
-    }
-
-    // Forgot Password Logic
-    function handleForgot() {
-        const e = document.getElementById('f-email').value;
-        if(localStorage.getItem(e)) { 
-            document.getElementById('f-success').style.display = 'block';
-            say("पासवर्ड रिकवरी लिंक आपके ईमेल पर भेज दी गई है।");
-            setTimeout(() => { showLogin(); }, 3000); // 3 सेकंड बाद वापस लॉगिन पर
-        } else { 
-            alert("Email not found! Please register first."); 
-        }
-    }
-
+    function enterDashboard() { document.getElementById('auth-overlay').style.display='none'; document.getElementById('loader').style.display='flex'; setTimeout(() => { document.getElementById('loader').style.display='none'; document.getElementById('main-content').style.display='block'; }, 2500); }
+    function handleRegister() { const e=document.getElementById('r-email').value, p=document.getElementById('r-pass').value, cp=document.getElementById('r-cpass').value; if(e && p && p===cp) { localStorage.setItem(e, p); say("अकाउंट बन गया।"); enterDashboard(); } else { alert(p!==cp?"Check Password!":"Fill all fields!"); } }
+    function handleLogin() { const e=document.getElementById('l-email').value, p=document.getElementById('l-pass').value; if(localStorage.getItem(e)===p) { say("लॉगिन सफल।"); enterDashboard(); } else { alert("Wrong credentials!"); } }
+    function handleForgot() { const e=document.getElementById('f-email').value; if(localStorage.getItem(e)) { alert("Link sent!"); showLogin(); } else { alert("Email not found!"); } }
     let tInt;
-    function closeTrade() { document.getElementById('pnl-section').style.display='none'; clearInterval(tInt); say("ट्रेड क्लोज कर दिया गया है।"); }
-
-    function startTrade(side) {
-        document.getElementById('pnl-section').style.display='block';
-        if(tInt) clearInterval(tInt);
-        say(side === 'buy' ? "बाय पोजीशन एक्टिव।" : "सेल पोजीशन एक्टिव।");
-        tInt = setInterval(() => {
-            let n = (Math.random() * 20 - 8).toFixed(2);
-            const el = document.getElementById('live-pnl');
-            el.innerText = (n >= 0 ? "+$" : "-$") + Math.abs(n);
-            el.className = "pnl-val " + (n >= 0 ? "green" : "red");
-        }, 1200);
-    }
+    function closeTrade() { document.getElementById('pnl-section').style.display='none'; clearInterval(tInt); say("ट्रेड क्लोज।"); }
+    function startTrade(side) { document.getElementById('pnl-section').style.display='block'; if(tInt) clearInterval(tInt); say(side+" ट्रेड शुरू।"); tInt = setInterval(() => { let n=(Math.random()*20-8).toFixed(2); const el=document.getElementById('live-pnl'); el.innerText=(n>=0? "+$":"-$")+Math.abs(n); el.className="pnl-val "+(n>=0?"green":"red"); }, 1200); }
 </script>
 </body>
 </html>
