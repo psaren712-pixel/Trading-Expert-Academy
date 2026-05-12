@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy | Pro</title>
+    <title>Trading Expert Academy | Voice Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background-color: #0b0e11; color: #eaecef; display: flex; flex-direction: column; min-height: 100vh; }
-        header { background: #161a1e; padding: 10px 20px; border-bottom: 1px solid #2b3139; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        body { background-color: #0b0e11; color: #eaecef; display: flex; flex-direction: column; min-height: 100vh; text-align: center; }
+        header { background: #161a1e; padding: 15px; border-bottom: 1px solid #2b3139; display: flex; justify-content: space-between; align-items: center; }
         .logo { color: #f0b90b; font-size: 1.2rem; font-weight: bold; }
-        #google_translate_element { margin-top: 5px; }
-        .chart-box { width: 95%; margin: 15px auto; height: 350px; border-radius: 12px; overflow: hidden; border: 1px solid #2b3139; }
-        .panel { background: #1e2329; margin: 10px auto; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; text-align: center; }
+        .chart-box { width: 95%; margin: 15px auto; height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid #2b3139; }
+        .panel { background: #1e2329; margin: 10px auto; width: 95%; max-width: 500px; padding: 25px; border-radius: 15px; }
         .actions { display: flex; gap: 15px; margin-top: 20px; }
-        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
         .buy { background: #2ebd85; color: white; }
         .sell { background: #f6465d; color: white; }
-        #feedback { margin-top: 20px; font-size: 1.1rem; min-height: 60px; }
-        .stars { font-size: 2rem; color: #f0b90b; display: block; }
+        #feedback { margin-top: 20px; font-size: 1.2rem; min-height: 80px; padding: 10px; border-radius: 8px; }
+        .stars { font-size: 2.5rem; color: #f0b90b; display: block; }
     </style>
 </head>
 <body>
@@ -28,32 +27,53 @@
 </header>
 
 <div class="chart-box">
-    <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=D&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
+    <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
 </div>
 
 <div class="panel">
     <h3>मार्केट रेजिस्टेंस पर है। आप क्या करेंगे?</h3>
     <div class="actions">
-        <button class="btn buy" onclick="check('buy')">BUY</button>
-        <button class="btn sell" onclick="check('sell')">SELL</button>
+        <button class="btn buy" onclick="analyze('buy')">BUY</button>
+        <button class="btn sell" onclick="analyze('sell')">SELL</button>
     </div>
     <div id="feedback"></div>
 </div>
 
-<script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement({pageLanguage: 'hi'}, 'google_translate_element');
+<script>
+    // आवाज़ सुनाने वाला फंक्शन
+    function speak(text) {
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = text;
+        msg.lang = 'hi-IN'; // हिंदी आवाज़
+        msg.rate = 1; // बोलने की रफ़्तार
+        window.speechSynthesis.speak(msg);
     }
-    function check(type) {
+
+    function analyze(type) {
         const fb = document.getElementById('feedback');
+        let message = "";
+        
         if(type === 'sell') {
-            fb.innerHTML = "<span class='stars'>⭐⭐</span> शानदार! सही फैसला।";
+            fb.style.backgroundColor = "rgba(46, 189, 133, 0.2)";
+            fb.innerHTML = "<span class='stars'>⭐⭐</span> <b style='color:#2ebd85'>शानदार ट्रेड!</b><br>रेजिस्टेंस पर बेचना सही है।";
+            message = "शानदार ट्रेड! आपने बिल्कुल सही फैसला लिया है। रेजिस्टेंस पर बेचना सबसे समझदारी वाला काम है। आपको दो स्टार मिलते हैं।";
         } else {
-            fb.innerHTML = "<b style='color:#f6465d'>गलत!</b> यहाँ से मार्केट गिर सकता है।";
+            fb.style.backgroundColor = "rgba(246, 70, 93, 0.2)";
+            fb.innerHTML = "<b style='color:#f6465d'>बड़ी गलती!</b><br>रेजिस्टेंस पर कभी न खरीदें।";
+            message = "बड़ी गलती! आप रेजिस्टेंस यानी छत पर खरीद रहे हैं। यहाँ से मार्केट गिरने का खतरा सबसे ज्यादा है। हमेशा सपोर्ट पर खरीदें और रेजिस्टेंस पर बेचें।";
         }
+
+        // आवाज़ सुनाओ
+        speak(message);
+
+        // 5 सेकंड बाद फीडबैक हटा दें (5000ms = 5 सेकंड)
+        setTimeout(() => {
+            fb.innerHTML = "";
+            fb.style.backgroundColor = "transparent";
+        }, 5000);
     }
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
