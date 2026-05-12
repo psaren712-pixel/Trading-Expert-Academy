@@ -3,159 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy | Professional Portal</title>
+    <title>Trading Expert Academy | Live PNL</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #0b0e11; color: #eaecef; overflow-x: hidden; }
 
-        /* Auth Screen */
-        #auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0b0e11; display: flex; align-items: center; justify-content: center; z-index: 2000;
-        }
-        .auth-box {
-            background: #1e2329; padding: 40px; border-radius: 24px; width: 90%; max-width: 400px;
-            text-align: center; border: 1px solid #2b3139; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-        }
-        .auth-box h2 { color: #f0b90b; margin-bottom: 10px; font-size: 1.8rem; }
-        .auth-box p { color: #848e9c; margin-bottom: 25px; font-size: 0.9rem; }
-        .auth-box input {
-            width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 15px;
-            border-radius: 12px; color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none;
-        }
-        .auth-box button {
-            width: 100%; background: #f0b90b; border: none; padding: 15px; border-radius: 12px;
-            font-weight: bold; font-size: 1.1rem; cursor: pointer; color: #0b0e11;
-        }
+        /* Auth & Loader remain same for DLX feel */
+        #auth-overlay, #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b0e11; display: flex; align-items: center; justify-content: center; z-index: 2000; }
+        .auth-box { background: #1e2329; padding: 35px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #2b3139; }
+        input { width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 14px; border-radius: 12px; color: #fff; margin-bottom: 12px; outline: none; }
+        button { width: 100%; background: #f0b90b; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; color: #0b0e11; }
 
-        /* Loading Spinner */
-        #loader {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0b0e11; z-index: 3000; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .spinner {
-            width: 60px; height: 60px; border: 6px solid #2b3139; border-top: 6px solid #f0b90b;
-            border-radius: 50%; animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Live PNL Panel */
+        .pnl-panel { background: #1e2329; margin: 15px; padding: 20px; border-radius: 15px; border: 1px solid #2b3139; display: none; }
+        .pnl-value { font-size: 2rem; font-weight: bold; margin: 10px 0; transition: 0.3s; }
+        .green { color: #2ebd85; }
+        .red { color: #f6465d; }
 
-        /* Main Academy Content */
-        #main-content { display: none; }
-        header { background: #161a1e; padding: 15px; border-bottom: 2px solid #f0b90b; text-align: center; }
-        .chart-container { width: 95%; margin: 20px auto; height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid #2b3139; }
-        .app-container { width: 95%; max-width: 480px; margin: 0 auto 40px; background: #1e2329; padding: 25px; border-radius: 20px; border: 1px solid #2b3139; }
-        .amt-input { width: 100%; background: #0b0e11; color: #f0b90b; border: 2px solid #2b3139; padding: 15px; border-radius: 12px; font-size: 1.3rem; text-align: center; margin: 15px 0; outline: none; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #0b0e11; padding: 15px; border-radius: 12px; border: 1px solid #2b3139; }
-        .trade-btn { flex: 1; padding: 18px; border-radius: 12px; border: none; font-weight: bold; color: #fff; cursor: pointer; transition: 0.2s; }
+        #main-content { display: none; text-align: center; }
+        .chart-frame { width: 96%; margin: 10px auto; height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid #2b3139; }
     </style>
 </head>
 <body>
 
-<!-- 1. Auth Overlay -->
 <div id="auth-overlay">
-    <!-- First: Register Screen -->
-    <div class="auth-box" id="reg-section">
+    <div class="auth-box" id="reg-box">
         <h2>Register</h2>
-        <p>Create your academy account</p>
-        <input type="email" id="r-email" placeholder="Email Address">
-        <input type="password" id="r-pass" placeholder="Create Password">
-        <input type="password" id="c-pass" placeholder="Confirm Password">
-        <button onclick="handleReg()">REGISTER NOW</button>
-        <p onclick="showLogin()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">Already have an account? Login</p>
+        <input type="password" id="reg-pass" placeholder="Create Password">
+        <button onclick="saveUser()">REGISTER</button>
     </div>
-
-    <!-- Second: Login Screen -->
-    <div class="auth-box" id="login-section" style="display:none;">
+    <div class="auth-box" id="log-box" style="display:none;">
         <h2>Login</h2>
-        <p>Enter credentials to trade</p>
-        <input type="text" id="l-user" placeholder="Email or Username">
-        <input type="password" id="l-pass" placeholder="Password (1234)">
-        <button onclick="handleLogin()">ACCESS PORTAL</button>
-        <p onclick="showReg()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">New member? Register here</p>
+        <input type="password" id="log-pass" placeholder="Enter Password">
+        <button onclick="checkUser()">ACCESS ACADEMY</button>
     </div>
 </div>
 
-<!-- 2. Loading Spinner (No OK Button) -->
-<div id="loader">
-    <div class="spinner"></div>
-    <p style="margin-top: 20px; color: #f0b90b; font-weight: bold; letter-spacing: 1px;">AUTHENTICATING...</p>
+<div id="loader" style="display:none;">
+    <div style="width:50px; height:50px; border:5px solid #2b3139; border-top:5px solid #f0b90b; border-radius:50%; animation:spin 1s linear infinite;"></div>
+    <p style="color:#f0b90b; margin-top:15px;">Live Syncing...</p>
 </div>
 
-<!-- 3. Main Academy Content -->
 <div id="main-content">
-    <header><div style="color:#f0b90b; font-weight:bold; font-size:1.3rem;">TRADING EXPERT ACADEMY</div></header>
-    <div class="chart-container">
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=D&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
+    <header style="padding:15px; border-bottom:1px solid #2b3139;"><h2 style="color:#f0b90b;">TE ACADEMY</h2></header>
+    
+    <div class="chart-frame">
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
     </div>
-    <div class="app-container">
-        <h3 style="text-align:left; font-size:1rem; margin-bottom:10px;">Market Analysis: Resistance</h3>
-        <input type="number" id="invest" class="amt-input" value="1000" oninput="update()">
-        <div class="stats-grid">
-            <div class="stat-card"><small style="color:#848e9c">STOP LOSS</small><br><b style="color:#f6465d" id="sl">-$50.00</b></div>
-            <div class="stat-card"><small style="color:#848e9c">PROFIT</small><br><b style="color:#2ebd85" id="tp">+$150.00</b></div>
+
+    <!-- Live PNL Area -->
+    <div class="pnl-panel" id="pnl-section">
+        <p style="font-size:0.8rem; color:#848e9c;">Floating Profit/Loss (PNL)</p>
+        <div id="live-pnl" class="pnl-value">$0.00</div>
+        <p id="pnl-pct" style="font-size:0.9rem;">0.00%</p>
+    </div>
+
+    <div style="padding:20px;">
+        <input type="number" id="trade-amt" value="1000" style="width:100%; background:#0b0e11; color:#f0b90b; border:1px solid #2b3139; padding:15px; border-radius:12px; text-align:center; font-size:1.2rem;">
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button style="flex:1; background:#2ebd85; color:white;" onclick="startTrade('buy')">BUY</button>
+            <button style="flex:1; background:#f6465d; color:white;" onclick="startTrade('sell')">SELL</button>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="trade-btn" style="background:#2ebd85" onclick="trade('buy')">BUY</button>
-            <button class="trade-btn" style="background:#f6465d" onclick="trade('sell')">SELL</button>
-        </div>
-        <div id="fb" style="margin-top:20px; font-weight:bold; min-height:40px;"></div>
     </div>
 </div>
 
 <script>
+    let pnlInterval;
     function say(t) { window.speechSynthesis.cancel(); const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
 
-    function showLogin() { document.getElementById('reg-section').style.display='none'; document.getElementById('login-section').style.display='block'; }
-    function showReg() { document.getElementById('reg-section').style.display='block'; document.getElementById('login-section').style.display='none'; }
-
-    function handleReg() {
-        const p1 = document.getElementById('r-pass').value;
-        const p2 = document.getElementById('c-pass').value;
-        if(p1 === p2 && p1 !== "") {
-            showLogin(); // रजिस्टर के बाद सीधे लॉगिन स्क्रीन
-            say("रजिस्ट्रेशन सफल रहा। अब कृपया लॉगिन करें।");
-        } else {
-            alert("Passwords do not match!");
-        }
+    function saveUser() { 
+        localStorage.setItem('te_pass', document.getElementById('reg-pass').value); 
+        document.getElementById('reg-box').style.display='none'; 
+        document.getElementById('log-box').style.display='block'; 
     }
 
-    function handleLogin() {
-        const p = document.getElementById('l-pass').value;
-        if(p === "1234") {
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('loader').style.display = 'flex'; // लोडिंग शुरू
-
+    function checkUser() {
+        if(document.getElementById('log-pass').value === localStorage.getItem('te_pass')) {
+            document.getElementById('auth-overlay').style.display='none';
+            document.getElementById('loader').style.display='flex';
             setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                say("स्वागत है! अब आप ट्रेड कर सकते हैं।");
-            }, 3000); // 3 सेकंड की लोडिंग
-        } else {
-            alert("Invalid Password!");
-        }
+                document.getElementById('loader').style.display='none';
+                document.getElementById('main-content').style.display='block';
+            }, 2000);
+        } else { alert("Wrong Password!"); }
     }
 
-    function update() {
-        const v = document.getElementById('invest').value || 0;
-        document.getElementById('sl').innerText = "-$" + (v * 0.05).toFixed(2);
-        document.getElementById('tp').innerText = "+$" + (v * 0.15).toFixed(2);
+    function startTrade(type) {
+        document.getElementById('pnl-section').style.display = 'block';
+        const amt = document.getElementById('trade-amt').value;
+        say(type === 'buy' ? "बाय ट्रेड शुरू हो गया है।" : "सेल ट्रेड शुरू हो गया है।");
+        
+        if(pnlInterval) clearInterval(pnlInterval);
+
+        // लाइव PNL का जादू यहाँ है
+        pnlInterval = setInterval(() => {
+            // थोड़ा सा रैंडम उतार-चढ़ाव (Realistic feel)
+            let change = (Math.random() * 10 - 4.5).toFixed(2); 
+            const display = document.getElementById('live-pnl');
+            const pct = document.getElementById('pnl-pct');
+            
+            display.innerText = (change >= 0 ? "+$" : "-$") + Math.abs(change);
+            display.className = "pnl-value " + (change >= 0 ? "green" : "red");
+            pct.innerText = ((change/amt)*100).toFixed(2) + "%";
+            pct.className = (change >= 0 ? "green" : "red");
+        }, 1500);
     }
 
-    function trade(side) {
-        const v = document.getElementById('invest').value;
-        const tp = (v * 0.15).toFixed(2);
-        const sl = (v * 0.05).toFixed(2);
-        const fb = document.getElementById('fb');
-        if(side === 'sell') {
-            fb.innerHTML = "<span style='color:#2ebd85'>Good Job! Potential Profit: $" + tp + "</span>";
-            say("शानदार! सेल करने से आपका मुनाफा " + tp + " डॉलर होगा।");
-        } else {
-            fb.innerHTML = "<span style='color:#f6465d'>Wait! High Risk: $" + sl + "</span>";
-            say("सावधान! यहाँ खरीदने से आपका नुकसान हो सकता है।");
-        }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 </script>
 </body>
 </html>
