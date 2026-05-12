@@ -3,67 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Exness Ultra Terminal</title>
+    <title>Exness Ultimate Terminal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #000; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* TOP BAR WITH DEMO PILL (As requested) */
-        header { background: #121212; padding: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; border-bottom: 1px solid #333; z-index: 10; }
-        .demo-pill { background: #1e3a2f; color: #4caf50; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; border: 1px solid #2d5a44; text-transform: uppercase; }
-        .balance-text { font-size: 18px; font-weight: 700; color: #fff; }
+        /* EXACT EXNESS TOP BAR */
+        header { background: #121212; padding: 12px; display: flex; justify-content: center; align-items: center; gap: 12px; border-bottom: 1px solid #333; z-index: 100; }
+        .demo-pill { background: #1e3a2f; color: #4caf50; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; border: 1px solid #2d5a44; letter-spacing: 0.5px; }
+        .balance-val { font-size: 20px; font-weight: 700; color: #fff; }
 
-        /* FULL SCREEN CHART SECTION */
-        .main-view { flex: 1; position: relative; width: 100%; background: #000; }
-        #tradingview_widget { width: 100%; height: 100%; }
+        /* FULL CHART */
+        .chart-area { flex: 1; position: relative; width: 100%; background: #000; }
+        #tv-container { width: 100%; height: 100%; }
 
-        /* ACTIVE FLOATING PNL BOX (Follows Candle) */
-        #floating-pnl { 
-            position: absolute; right: 50px; top: 45%; 
+        /* FLOATING P&L BOX (CANDLE TRACKER) */
+        #pnl-label { 
+            position: absolute; right: 50px; top: 50%; 
             background: rgba(38, 166, 154, 0.95); color: #000; 
-            padding: 8px 14px; border-radius: 4px; font-weight: 800; 
-            display: none; z-index: 100; font-size: 13px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-            align-items: center; gap: 10px;
-            transition: top 0.5s ease-out; 
+            padding: 8px 15px; border-radius: 4px; font-weight: 800; 
+            display: none; z-index: 200; font-size: 13px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            align-items: center; gap: 12px;
+            transition: top 0.4s ease-out, background 0.3s;
         }
+        .close-x { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 3px; cursor: pointer; font-size: 16px; }
 
-        /* OVERLAY CONTROLS */
-        .overlay-controls { 
-            position: absolute; bottom: 15px; left: 0; width: 100%; 
-            padding: 0 15px; display: flex; flex-direction: column; gap: 10px; z-index: 100;
+        /* FLOATING BUTTONS OVERLAY */
+        .ui-overlay { 
+            position: absolute; bottom: 20px; left: 0; width: 100%; 
+            padding: 0 15px; display: flex; flex-direction: column; gap: 12px; z-index: 300;
         }
-        .amount-input { 
-            background: rgba(23, 27, 38, 0.9); border: 1px solid #444; 
-            color: white; padding: 10px; border-radius: 8px; width: 100px; 
-            text-align: center; align-self: center; font-weight: bold;
+        .amt-input { 
+            background: rgba(23, 27, 38, 0.95); border: 1px solid #444; 
+            color: white; padding: 12px; border-radius: 8px; width: 110px; 
+            text-align: center; align-self: center; font-weight: 800; font-size: 16px;
         }
-        .btn-group { display: flex; gap: 10px; width: 100%; }
-        .action-btn { flex: 1; padding: 16px; border: none; border-radius: 8px; font-weight: 800; font-size: 16px; color: white; cursor: pointer; }
+        .action-row { display: flex; gap: 12px; width: 100%; }
+        .btn-trade { flex: 1; padding: 18px; border: none; border-radius: 8px; font-weight: 800; font-size: 18px; color: white; cursor: pointer; text-transform: uppercase; }
         .buy { background: #26a69a; }
         .sell { background: #ef5350; }
     </style>
 </head>
-<body onclick="enableVoice()">
+<body onclick="startVoice()">
 
     <header>
         <div class="demo-pill">DEMO</div>
-        <div class="balance-text">$<span id="balance">200,303.21</span></div>
+        <div class="balance-val">$<span id="balance">200,303.21</span></div>
     </header>
 
-    <div class="main-view">
-        <div id="floating-pnl">
-            <span id="pnl-val">100.00 +0.00 USD</span>
-            <span onclick="closeTrade()" style="cursor:pointer; font-size:16px;">✕</span>
+    <div class="chart-area">
+        <div id="pnl-label">
+            <span id="live-pnl">100.00 +0.00 USD</span>
+            <div class="close-x" onclick="closeTrade()">✕</div>
         </div>
         
-        <div id="tradingview_widget"></div>
+        <div id="tv-container"></div>
 
-        <div class="overlay-controls">
-            <input type="number" id="trade-amt" class="amount-input" value="100">
-            <div class="btn-group">
-                <button class="action-btn buy" onclick="openTrade('BUY')">BUY</button>
-                <button class="action-btn sell" onclick="openTrade('SELL')">SELL</button>
+        <div class="ui-overlay">
+            <input type="number" id="trade-val" class="amt-input" value="1000">
+            <div class="action-row">
+                <button class="btn-trade buy" onclick="openTrade('BUY')">Buy</button>
+                <button class="btn-trade sell" onclick="openTrade('SELL')">Sell</button>
             </div>
         </div>
     </div>
@@ -71,59 +72,58 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
         let balance = 200303.21;
-        let pnlInt, curPnl = 0;
-        let voiceEnabled = false;
+        let pnlTimer, activePnl = 0;
+        let voiceReady = false;
 
         new TradingView.widget({
             "autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "1",
-            "theme": "dark", "style": "1", "container_id": "tradingview_widget"
+            "theme": "dark", "style": "1", "container_id": "tv-container", "hide_top_toolbar": false
         });
 
-        function enableVoice() {
-            if (!voiceEnabled) {
-                voiceEnabled = true;
-                speak("वॉयस सिस्टम सक्रिय हो गया है।");
+        function startVoice() {
+            if(!voiceReady) {
+                voiceReady = true;
+                speak("वॉयस असिस्टेंट तैयार है। ट्रेडिंग शुरू करें।");
             }
         }
 
         function openTrade(type) {
-            let amt = document.getElementById('trade-amt').value;
-            let pnlBox = document.getElementById('floating-pnl');
-            pnlBox.style.display = 'flex';
+            let amt = document.getElementById('trade-val').value;
+            let label = document.getElementById('pnl-label');
+            label.style.display = 'flex';
             
-            // "गुरु" वाली आवाज़
-            speak("सावधान ट्रेडर, " + type + " पोजीशन ले ली गई है। मार्केट कैंडल के साथ अपना प्रॉफिट ट्रैक करें।");
+            speak("गुरु की सलाह: " + type + " पोजीशन एक्टिव है। इस कैंडल के मूव पर ध्यान दें।");
             
-            pnlInt = setInterval(() => {
-                let change = (Math.random() * 40 - 15).toFixed(2);
-                curPnl = (parseFloat(curPnl) + parseFloat(change)).toFixed(2);
+            pnlTimer = setInterval(() => {
+                let change = (Math.random() * 50 - 20).toFixed(2);
+                activePnl = (parseFloat(activePnl) + parseFloat(change)).toFixed(2);
                 
-                // कैंडल के साथ ऊपर-नीचे होने वाला मूवमेंट
-                let moveTop = Math.floor(Math.random() * 40) + 30;
-                pnlBox.style.top = moveTop + "%";
+                // Candle Following Logic
+                let candlePos = Math.floor(Math.random() * 35) + 30;
+                label.style.top = candlePos + "%";
                 
-                let sign = curPnl >= 0 ? "+" : "";
-                document.getElementById('pnl-val').innerText = amt + " " + sign + curPnl + " USD";
-                pnlBox.style.background = curPnl >= 0 ? "rgba(38, 166, 154, 0.95)" : "rgba(239, 83, 80, 0.95)";
+                let valBox = document.getElementById('live-pnl');
+                valBox.innerText = amt + " " + (activePnl >= 0 ? "+" : "") + activePnl + " USD";
+                label.style.background = activePnl >= 0 ? "rgba(38, 166, 154, 0.95)" : "rgba(239, 83, 80, 0.95)";
             }, 1000);
         }
 
         function closeTrade() {
-            clearInterval(pnlInt);
-            balance = (parseFloat(balance) + parseFloat(curPnl)).toFixed(2);
+            clearInterval(pnlTimer);
+            balance = (parseFloat(balance) + parseFloat(activePnl)).toFixed(2);
             document.getElementById('balance').innerText = parseFloat(balance).toLocaleString();
-            document.getElementById('floating-pnl').style.display = 'none';
-            speak("सौदा बंद। आपका प्रॉफिट बैलेंस में जोड़ दिया गया है।");
-            curPnl = 0;
+            document.getElementById('pnl-label').style.display = 'none';
+            speak("ट्रेड बंद कर दिया गया है। मुनाफा अपडेट हो गया।");
+            activePnl = 0;
         }
 
-        function speak(t) {
+        function speak(txt) {
             window.speechSynthesis.cancel();
-            let m = new SpeechSynthesisUtterance(t);
-            m.lang = 'hi-IN';
-            m.pitch = 0.9; // गुरु जैसी गहरी आवाज़ के लिए
-            m.rate = 0.9;
-            window.speechSynthesis.speak(m);
+            let utt = new SpeechSynthesisUtterance(txt);
+            utt.lang = 'hi-IN';
+            utt.pitch = 0.85; 
+            utt.rate = 0.95;
+            window.speechSynthesis.speak(utt);
         }
     </script>
 </body>
