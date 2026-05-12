@@ -3,68 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Expert Trading Terminal</title>
+    <title>Exness Ultra Terminal</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0b0e14; color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background: #000; color: white; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* HEADER */
-        .top-nav { background: #171b26; padding: 10px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #333; }
-        .balance { color: #ffcc00; font-weight: bold; font-size: 18px; }
+        /* TOP BAR WITH DEMO PILL (As requested) */
+        header { background: #121212; padding: 12px; display: flex; justify-content: center; align-items: center; gap: 10px; border-bottom: 1px solid #333; z-index: 10; }
+        .demo-pill { background: #1e3a2f; color: #4caf50; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; border: 1px solid #2d5a44; text-transform: uppercase; }
+        .balance-text { font-size: 18px; font-weight: 700; color: #fff; }
 
-        /* CHART AREA */
-        .chart-section { flex: 1; position: relative; }
+        /* FULL SCREEN CHART SECTION */
+        .main-view { flex: 1; position: relative; width: 100%; background: #000; }
+        #tradingview_widget { width: 100%; height: 100%; }
 
-        /* FOOTER CONTROLS - (बटन की पोजीशन को ऊपर रखा गया है) */
-        .controls { background: #171b26; padding: 15px; border-top: 2px solid #333; display: flex; flex-direction: column; gap: 10px; }
-        .input-box { display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 5px; }
-        input { background: #2a2e39; border: none; color: white; padding: 10px; border-radius: 5px; width: 120px; text-align: center; }
-        
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { padding: 20px; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; color: white; }
+        /* ACTIVE FLOATING PNL BOX (Follows Candle) */
+        #floating-pnl { 
+            position: absolute; right: 50px; top: 45%; 
+            background: rgba(38, 166, 154, 0.95); color: #000; 
+            padding: 8px 14px; border-radius: 4px; font-weight: 800; 
+            display: none; z-index: 100; font-size: 13px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            align-items: center; gap: 10px;
+            transition: top 0.5s ease-out; 
+        }
+
+        /* OVERLAY CONTROLS */
+        .overlay-controls { 
+            position: absolute; bottom: 15px; left: 0; width: 100%; 
+            padding: 0 15px; display: flex; flex-direction: column; gap: 10px; z-index: 100;
+        }
+        .amount-input { 
+            background: rgba(23, 27, 38, 0.9); border: 1px solid #444; 
+            color: white; padding: 10px; border-radius: 8px; width: 100px; 
+            text-align: center; align-self: center; font-weight: bold;
+        }
+        .btn-group { display: flex; gap: 10px; width: 100%; }
+        .action-btn { flex: 1; padding: 16px; border: none; border-radius: 8px; font-weight: 800; font-size: 16px; color: white; cursor: pointer; }
         .buy { background: #26a69a; }
         .sell { background: #ef5350; }
-        
-        /* FLOATING PNL */
-        #floating-pnl { position: absolute; right: 20px; top: 40%; background: #26a69a; color: white; padding: 8px 12px; border-radius: 5px; display: none; z-index: 999; font-weight: bold; }
     </style>
 </head>
-<body>
+<body onclick="enableVoice()">
 
-    <div class="top-nav">
-        <div class="balance">Balance: $<span id="balance">200303.21</span></div>
-    </div>
+    <header>
+        <div class="demo-pill">DEMO</div>
+        <div class="balance-text">$<span id="balance">200,303.21</span></div>
+    </header>
 
-    <div class="chart-section">
+    <div class="main-view">
         <div id="floating-pnl">
-            <span id="pnl-text">0.00 USD</span>
-            <span onclick="closeTrade()" style="margin-left:10px; cursor:pointer;">✕</span>
+            <span id="pnl-val">100.00 +0.00 USD</span>
+            <span onclick="closeTrade()" style="cursor:pointer; font-size:16px;">✕</span>
         </div>
-        <div id="tv-widget" style="width:100%; height:100%;"></div>
-    </div>
+        
+        <div id="tradingview_widget"></div>
 
-    <div class="controls">
-        <div class="input-box">
-            <span>Amount:</span>
-            <input type="number" id="trade-amount" value="100">
-        </div>
-        <div class="btn-grid">
-            <button class="btn buy" onclick="openTrade('BUY')">BUY</button>
-            <button class="btn sell" onclick="openTrade('SELL')">SELL</button>
+        <div class="overlay-controls">
+            <input type="number" id="trade-amt" class="amount-input" value="100">
+            <div class="btn-group">
+                <button class="action-btn buy" onclick="openTrade('BUY')">BUY</button>
+                <button class="action-btn sell" onclick="openTrade('SELL')">SELL</button>
+            </div>
         </div>
     </div>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // JS logic same as before...
-        new TradingView.widget({"autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "1", "theme": "dark", "container_id": "tv-widget"});
-        
-        function openTrade(type) {
-            document.getElementById('floating-pnl').style.display = 'flex';
-            // ... बाकी कोड पहले जैसा
+        let balance = 200303.21;
+        let pnlInt, curPnl = 0;
+        let voiceEnabled = false;
+
+        new TradingView.widget({
+            "autosize": true, "symbol": "BINANCE:BTCUSDT", "interval": "1",
+            "theme": "dark", "style": "1", "container_id": "tradingview_widget"
+        });
+
+        function enableVoice() {
+            if (!voiceEnabled) {
+                voiceEnabled = true;
+                speak("वॉयस सिस्टम सक्रिय हो गया है।");
+            }
         }
+
+        function openTrade(type) {
+            let amt = document.getElementById('trade-amt').value;
+            let pnlBox = document.getElementById('floating-pnl');
+            pnlBox.style.display = 'flex';
+            
+            // "गुरु" वाली आवाज़
+            speak("सावधान ट्रेडर, " + type + " पोजीशन ले ली गई है। मार्केट कैंडल के साथ अपना प्रॉफिट ट्रैक करें।");
+            
+            pnlInt = setInterval(() => {
+                let change = (Math.random() * 40 - 15).toFixed(2);
+                curPnl = (parseFloat(curPnl) + parseFloat(change)).toFixed(2);
+                
+                // कैंडल के साथ ऊपर-नीचे होने वाला मूवमेंट
+                let moveTop = Math.floor(Math.random() * 40) + 30;
+                pnlBox.style.top = moveTop + "%";
+                
+                let sign = curPnl >= 0 ? "+" : "";
+                document.getElementById('pnl-val').innerText = amt + " " + sign + curPnl + " USD";
+                pnlBox.style.background = curPnl >= 0 ? "rgba(38, 166, 154, 0.95)" : "rgba(239, 83, 80, 0.95)";
+            }, 1000);
+        }
+
         function closeTrade() {
+            clearInterval(pnlInt);
+            balance = (parseFloat(balance) + parseFloat(curPnl)).toFixed(2);
+            document.getElementById('balance').innerText = parseFloat(balance).toLocaleString();
             document.getElementById('floating-pnl').style.display = 'none';
+            speak("सौदा बंद। आपका प्रॉफिट बैलेंस में जोड़ दिया गया है।");
+            curPnl = 0;
+        }
+
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            let m = new SpeechSynthesisUtterance(t);
+            m.lang = 'hi-IN';
+            m.pitch = 0.9; // गुरु जैसी गहरी आवाज़ के लिए
+            m.rate = 0.9;
+            window.speechSynthesis.speak(m);
         }
     </script>
 </body>
