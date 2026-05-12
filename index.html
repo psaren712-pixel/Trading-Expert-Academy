@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Expert Academy | Pro Portal</title>
+    <title>Trading Expert Academy | Professional Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background-color: #0b0e11; color: #eaecef; overflow-x: hidden; }
 
-        /* Auth Overlay */
+        /* Auth Screen */
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b0e11; display: flex; align-items: center; justify-content: center; z-index: 2000;
@@ -18,7 +18,8 @@
             background: #1e2329; padding: 40px; border-radius: 24px; width: 90%; max-width: 400px;
             text-align: center; border: 1px solid #2b3139; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
-        .auth-box h2 { color: #f0b90b; margin-bottom: 20px; font-size: 1.8rem; }
+        .auth-box h2 { color: #f0b90b; margin-bottom: 10px; font-size: 1.8rem; }
+        .auth-box p { color: #848e9c; margin-bottom: 25px; font-size: 0.9rem; }
         .auth-box input {
             width: 100%; background: #0b0e11; border: 1px solid #2b3139; padding: 15px;
             border-radius: 12px; color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none;
@@ -34,95 +35,106 @@
             background: #0b0e11; z-index: 3000; flex-direction: column; align-items: center; justify-content: center;
         }
         .spinner {
-            width: 50px; height: 50px; border: 5px solid #2b3139; border-top: 5px solid #f0b90b;
+            width: 60px; height: 60px; border: 6px solid #2b3139; border-top: 6px solid #f0b90b;
             border-radius: 50%; animation: spin 1s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Main Content */
+        /* Main Academy Content */
         #main-content { display: none; }
         header { background: #161a1e; padding: 15px; border-bottom: 2px solid #f0b90b; text-align: center; }
-        .chart-container { width: 95%; margin: 15px auto; height: 350px; border-radius: 15px; overflow: hidden; }
-        .app-container { width: 95%; max-width: 450px; margin: 0 auto; background: #1e2329; padding: 25px; border-radius: 20px; border: 1px solid #2b3139; }
-        .amt-input { width: 100%; background: #0b0e11; color: #f0b90b; border: 2px solid #2b3139; padding: 15px; border-radius: 12px; font-size: 1.3rem; text-align: center; margin: 15px 0; }
+        .chart-container { width: 95%; margin: 20px auto; height: 350px; border-radius: 15px; overflow: hidden; border: 1px solid #2b3139; }
+        .app-container { width: 95%; max-width: 480px; margin: 0 auto 40px; background: #1e2329; padding: 25px; border-radius: 20px; border: 1px solid #2b3139; }
+        .amt-input { width: 100%; background: #0b0e11; color: #f0b90b; border: 2px solid #2b3139; padding: 15px; border-radius: 12px; font-size: 1.3rem; text-align: center; margin: 15px 0; outline: none; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #0b0e11; padding: 12px; border-radius: 12px; border: 1px solid #2b3139; }
-        .btn-group { display: flex; gap: 10px; }
-        .trade-btn { flex: 1; padding: 18px; border-radius: 12px; border: none; font-weight: bold; color: #fff; cursor: pointer; }
+        .stat-card { background: #0b0e11; padding: 15px; border-radius: 12px; border: 1px solid #2b3139; }
+        .trade-btn { flex: 1; padding: 18px; border-radius: 12px; border: none; font-weight: bold; color: #fff; cursor: pointer; transition: 0.2s; }
     </style>
 </head>
 <body>
 
 <!-- 1. Auth Overlay -->
 <div id="auth-overlay">
-    <div class="auth-box" id="login-section">
-        <h2>Login</h2>
-        <input type="text" id="user" placeholder="Username">
-        <input type="password" id="pass" placeholder="Password (1234)">
-        <button onclick="startLoading('login')">LOGIN</button>
-        <p onclick="toggleAuth()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">No account? Register</p>
-    </div>
-    <div class="auth-box" id="reg-section" style="display:none;">
+    <!-- First: Register Screen -->
+    <div class="auth-box" id="reg-section">
         <h2>Register</h2>
-        <input type="email" placeholder="Email">
-        <input type="password" id="r-pass" placeholder="Password">
+        <p>Create your academy account</p>
+        <input type="email" id="r-email" placeholder="Email Address">
+        <input type="password" id="r-pass" placeholder="Create Password">
         <input type="password" id="c-pass" placeholder="Confirm Password">
-        <button onclick="startLoading('reg')">REGISTER</button>
-        <p onclick="toggleAuth()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">Back to Login</p>
+        <button onclick="handleReg()">REGISTER NOW</button>
+        <p onclick="showLogin()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">Already have an account? Login</p>
+    </div>
+
+    <!-- Second: Login Screen -->
+    <div class="auth-box" id="login-section" style="display:none;">
+        <h2>Login</h2>
+        <p>Enter credentials to trade</p>
+        <input type="text" id="l-user" placeholder="Email or Username">
+        <input type="password" id="l-pass" placeholder="Password (1234)">
+        <button onclick="handleLogin()">ACCESS PORTAL</button>
+        <p onclick="showReg()" style="color:#848e9c; font-size:0.8rem; margin-top:15px; cursor:pointer;">New member? Register here</p>
     </div>
 </div>
 
-<!-- 2. Loading Spinner -->
+<!-- 2. Loading Spinner (No OK Button) -->
 <div id="loader">
     <div class="spinner"></div>
-    <p style="margin-top: 15px; color: #f0b90b; font-weight: bold;">Processing Data...</p>
+    <p style="margin-top: 20px; color: #f0b90b; font-weight: bold; letter-spacing: 1px;">AUTHENTICATING...</p>
 </div>
 
 <!-- 3. Main Academy Content -->
 <div id="main-content">
-    <header><h1 style="color:#f0b90b; font-size:1.2rem;">TRADING EXPERT ACADEMY</h1></header>
+    <header><div style="color:#f0b90b; font-weight:bold; font-size:1.3rem;">TRADING EXPERT ACADEMY</div></header>
     <div class="chart-container">
         <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=D&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
     </div>
     <div class="app-container">
-        <p style="font-size: 0.8rem; color: #848e9c;">Enter Trade Amount:</p>
+        <h3 style="text-align:left; font-size:1rem; margin-bottom:10px;">Market Analysis: Resistance</h3>
         <input type="number" id="invest" class="amt-input" value="1000" oninput="update()">
         <div class="stats-grid">
-            <div class="stat-card">STOP LOSS<br><b style="color:#f6465d" id="sl">-$50.00</b></div>
-            <div class="stat-card">TAKE PROFIT<br><b style="color:#2ebd85" id="tp">+$150.00</b></div>
+            <div class="stat-card"><small style="color:#848e9c">STOP LOSS</small><br><b style="color:#f6465d" id="sl">-$50.00</b></div>
+            <div class="stat-card"><small style="color:#848e9c">PROFIT</small><br><b style="color:#2ebd85" id="tp">+$150.00</b></div>
         </div>
-        <div class="btn-group">
-            <button class="trade-btn" style="background:#2ebd85" onclick="action('buy')">BUY</button>
-            <button class="trade-btn" style="background:#f6465d" onclick="action('sell')">SELL</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="trade-btn" style="background:#2ebd85" onclick="trade('buy')">BUY</button>
+            <button class="trade-btn" style="background:#f6465d" onclick="trade('sell')">SELL</button>
         </div>
-        <div id="fb" style="margin-top:20px; font-weight:bold;"></div>
+        <div id="fb" style="margin-top:20px; font-weight:bold; min-height:40px;"></div>
     </div>
 </div>
 
 <script>
     function say(t) { window.speechSynthesis.cancel(); const s = new SpeechSynthesisUtterance(t); s.lang = 'hi-IN'; window.speechSynthesis.speak(s); }
 
-    function toggleAuth() {
-        const l = document.getElementById('login-section');
-        const r = document.getElementById('reg-section');
-        l.style.display = l.style.display === 'none' ? 'block' : 'none';
-        r.style.display = r.style.display === 'none' ? 'block' : 'none';
+    function showLogin() { document.getElementById('reg-section').style.display='none'; document.getElementById('login-section').style.display='block'; }
+    function showReg() { document.getElementById('reg-section').style.display='block'; document.getElementById('login-section').style.display='none'; }
+
+    function handleReg() {
+        const p1 = document.getElementById('r-pass').value;
+        const p2 = document.getElementById('c-pass').value;
+        if(p1 === p2 && p1 !== "") {
+            showLogin(); // रजिस्टर के बाद सीधे लॉगिन स्क्रीन
+            say("रजिस्ट्रेशन सफल रहा। अब कृपया लॉगिन करें।");
+        } else {
+            alert("Passwords do not match!");
+        }
     }
 
-    function startLoading(type) {
-        const pass = (type === 'login') ? document.getElementById('pass').value : document.getElementById('r-pass').value;
-        if(pass === "") { alert("Please enter password!"); return; }
+    function handleLogin() {
+        const p = document.getElementById('l-pass').value;
+        if(p === "1234") {
+            document.getElementById('auth-overlay').style.display = 'none';
+            document.getElementById('loader').style.display = 'flex'; // लोडिंग शुरू
 
-        // लोडिंग दिखाओ
-        document.getElementById('auth-overlay').style.display = 'none';
-        document.getElementById('loader').style.display = 'flex';
-
-        // 3 सेकंड बाद वेबसाइट खोलो (जैसे असली लोडिंग होती है)
-        setTimeout(() => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            say("स्वागत है देबाशीष! ट्रेडिंग एक्सपर्ट एकेडमी अब लाइव है।");
-        }, 3000);
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                say("स्वागत है! अब आप ट्रेड कर सकते हैं।");
+            }, 3000); // 3 सेकंड की लोडिंग
+        } else {
+            alert("Invalid Password!");
+        }
     }
 
     function update() {
@@ -131,16 +143,17 @@
         document.getElementById('tp').innerText = "+$" + (v * 0.15).toFixed(2);
     }
 
-    function action(type) {
-        const amt = document.getElementById('invest').value;
-        const tp = (amt * 0.15).toFixed(2);
-        const sl = (amt * 0.05).toFixed(2);
-        if(type === 'sell') {
-            document.getElementById('fb').innerHTML = "<span style='color:#2ebd85'>Excellent Sell! Profit: $" + tp + "</span>";
-            say("शानदार ट्रेड! रेजिस्टेंस पर सेल करने से आपका मुनाफा " + tp + " डॉलर होगा।");
+    function trade(side) {
+        const v = document.getElementById('invest').value;
+        const tp = (v * 0.15).toFixed(2);
+        const sl = (v * 0.05).toFixed(2);
+        const fb = document.getElementById('fb');
+        if(side === 'sell') {
+            fb.innerHTML = "<span style='color:#2ebd85'>Good Job! Potential Profit: $" + tp + "</span>";
+            say("शानदार! सेल करने से आपका मुनाफा " + tp + " डॉलर होगा।");
         } else {
-            document.getElementById('fb').innerHTML = "<span style='color:#f6465d'>Risky Buy! Risk: $" + sl + "</span>";
-            say("सावधान! यहाँ खरीदने से आपका " + sl + " डॉलर का नुकसान हो सकता है।");
+            fb.innerHTML = "<span style='color:#f6465d'>Wait! High Risk: $" + sl + "</span>";
+            say("सावधान! यहाँ खरीदने से आपका नुकसान हो सकता है।");
         }
     }
 </script>
