@@ -1,118 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Trading Expert Academy | AI Mentor Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Expert Academy - Advanced Guide</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body, html { height: 100%; overflow: hidden; background: #0b0e11; }
-        
-        /* Fixed Header */
-        header { position: fixed; top:0; left:0; width:100%; height:60px; background:#0b0e11; border-bottom:1px solid #2b3139; display:flex; justify-content:space-between; align-items:center; padding:0 20px; z-index:1000; }
-        .main-balance { color:#f0b90b; font-weight:bold; font-size:1.1rem; }
-        
-        /* Main Chart Area */
-        main { position:absolute; top:60px; bottom:110px; left:0; width:100%; overflow:hidden; }
-        
-        /* DYNAMIC PRICE TRACKER PNL */
-        #pnl-tracker {
-            display: none;
-            position: absolute;
-            right: 60px; 
-            background: rgba(30, 35, 41, 0.95);
-            padding: 6px 12px;
-            border-radius: 5px;
-            border-left: 4px solid #f0b90b;
-            z-index: 500;
-            transition: top 0.3s ease-out;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
-        /* Fixed Footer */
-        footer { position:fixed; bottom:0; left:0; width:100%; height:110px; background:#1e2329; border-top:1px solid #2b3139; padding:15px 20px; z-index:1000; }
-        .btns { display:flex; gap:12px; }
-        .btn { flex:1; padding:18px; border-radius:12px; border:none; font-weight:bold; color:white; cursor:pointer; font-size:1.1rem; }
+        body { font-family: 'Arial', sans-serif; background-color: #0f0f0f; color: white; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 450px; margin: auto; background: #1e1e1e; padding: 25px; border-radius: 15px; border: 1px solid #333; }
+        .btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .buy-btn { background-color: #28a745; color: white; }
+        .sell-btn { background-color: #dc3545; color: white; }
+        #guide-box { display: none; background: #2a2a2a; padding: 15px; margin-top: 20px; border-radius: 10px; text-align: left; border-left: 5px solid #ffcc00; }
+        h3 { color: #ffcc00; margin-top: 0; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; color: #ddd; }
     </style>
 </head>
 <body>
 
-<header>
-    <div style="color:white; font-size:0.8rem; font-weight:bold;">TE ACADEMY AI</div>
-    <div style="text-align:right;">
-        <div style="font-size:0.6rem; color:#848e9c;">DEMO WALLET</div>
-        <div class="main-balance" id="wallet">$5,000.00</div>
+    <div class="container">
+        <h2>Trading Expert Academy</h2>
+        <p>अपना ट्रेड चुनें और गाइडेंस देखें</p>
+        
+        <button class="btn buy-btn" onclick="showGuide('buy')">BUY गाइड शुरू करें 📈</button>
+        <button class="btn sell-btn" onclick="showGuide('sell')">SELL गाइड शुरू करें 📉</button>
+
+        <!-- यहाँ नीचे डिक्शनरी/गाइड खुलेगी -->
+        <div id="guide-box">
+            <h3 id="guide-title">निर्देश:</h3>
+            <ul id="guide-list">
+                <!-- यहाँ लिस्ट अपने आप आएगी -->
+            </ul>
+        </div>
     </div>
-</header>
 
-<main id="chart-area">
-    <div id="pnl-tracker">
-        <span id="pnl-val" style="font-weight:bold; font-size:1rem;">$0.00</span>
-        <span onclick="closeTrade()" style="margin-left:10px; color:#848e9c; cursor:pointer; font-weight:bold;">×</span>
-    </div>
-    <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&theme=dark" width="100%" height="100%" frameborder="0"></iframe>
-</main>
+    <script>
+        function showGuide(type) {
+            var box = document.getElementById('guide-box');
+            var list = document.getElementById('guide-list');
+            var title = document.getElementById('guide-title');
+            box.style.display = 'block';
+            list.innerHTML = ""; // पुराना साफ करने के लिए
 
-<footer>
-    <div style="color:#848e9c; font-size:0.6rem; text-align:center; margin-bottom:8px;">AI PREDICTION ACTIVE</div>
-    <div class="btns">
-        <button class="btn" style="background:#2ebd85;" onclick="startTrade('buy')">BUY</button>
-        <button class="btn" style="background:#f6465d;" onclick="startTrade('sell')">SELL</button>
-    </div>
-</footer>
+            if(type === 'buy') {
+                title.innerText = "BUY करने के नियम:";
+                var steps = [
+                    "1. मार्केट का ट्रेंड चेक करें (Bullish होना चाहिए)।",
+                    "2. RSI इंडिकेटर को देखें, क्या यह 30 के पास है?",
+                    "3. सपोर्ट लेवल पर ग्रीन कैंडल बनने का इंतज़ार करें।",
+                    "4. एंट्री लेने से पहले स्टॉप लॉस (SL) तय करें।"
+                ];
+                guide("बाय करने के नियम नीचे दिए गए हैं। सबसे पहले मार्केट ट्रेंड और सपोर्ट लेवल चेक करें।");
+            } else {
+                title.innerText = "SELL करने के नियम:";
+                var steps = [
+                    "1. मार्केट का ट्रेंड चेक करें (Bearish होना चाहिए)।",
+                    "2. रेजिस्टेंस लेवल पर रेड कैंडल देखें।",
+                    "3. वॉल्यूम चेक करें कि सेलर्स बढ़ रहे हैं या नहीं।",
+                    "4. अपनी रिस्क के हिसाब से टारगेट सेट करें।"
+                ];
+                guide("सेल करने के नियम नीचे लोड हो गए हैं। रेजिस्टेंस और वॉल्यूम पर ध्यान दें।");
+            }
 
-<script>
-    let bal = 5000.00;
-    let tradeTimer;
-    let sec = 0;
-
-    function say(txt) {
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(txt);
-        msg.lang = 'hi-IN';
-        msg.rate = 0.85;
-        window.speechSynthesis.speak(msg);
-    }
-
-    function closeTrade() {
-        document.getElementById('pnl-tracker').style.display = 'none';
-        clearInterval(tradeTimer);
-        sec = 0;
-        say("ट्रेड क्लोज किया गया। प्रॉफिट सुरक्षित है।");
-    }
-
-    function startTrade(side) {
-        const pnlTag = document.getElementById('pnl-tracker');
-        pnlTag.style.display = 'flex';
-        if(tradeTimer) clearInterval(tradeTimer);
-        sec = 0;
-
-        // Future Prediction & Candle Mentorship
-        if(side === 'buy') {
-            say("सिस्टम ने बुलिश हैमर कैंडल डिटेक्ट किया है। मार्केट यहाँ से ऊपर जाने वाला है, बाय एंट्री कन्फर्म है।");
-        } else {
-            say("सावधान! रेजिस्टेंस पर शूटिंग स्टार कैंडल दिखा है। मार्केट गिरने की भविष्यवाणी है, सेल करना सही होगा।");
+            // लिस्ट को स्क्रीन पर डालना
+            steps.forEach(function(step) {
+                var li = document.createElement("li");
+                li.innerText = step;
+                list.appendChild(li);
+            });
         }
 
-        tradeTimer = setInterval(() => {
-            sec++;
-            let pnl = (Math.random() * 110 - 45).toFixed(2);
-            bal += parseFloat(pnl);
-            
-            // PNL Tracker Movement (Price Line के साथ)
-            let dynamicTop = Math.floor(Math.random() * 250) + 100; 
-            pnlTag.style.top = dynamicTop + "px";
-
-            document.getElementById('pnl-val').innerText = (pnl >= 0 ? "+$" : "-$") + Math.abs(pnl);
-            document.getElementById('pnl-val').style.color = pnl >= 0 ? "#2ebd85" : "#f6465d";
-            document.getElementById('wallet').innerText = "$" + bal.toLocaleString(undefined, {minimumFractionDigits: 2});
-
-            // Mid-Trade Prediction Warning
-            if (sec === 8) {
-                say("अलर्ट! अगली कैंडल बेयरिश डोजी बन रही है। अब क्लोज कर दीजिए, इसके बाद बड़ा लॉस होने वाला है।");
-            }
-        }, 1200);
-    }
-</script>
+        function guide(message) {
+            window.speechSynthesis.cancel(); 
+            var speech = new SpeechSynthesisUtterance();
+            speech.text = message;
+            speech.lang = 'hi-IN';
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
 </body>
 </html>
